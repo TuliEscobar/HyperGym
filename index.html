@@ -555,6 +555,14 @@
                     <span id="drive-status-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">Desconectado</span>
                 </div>
 
+                <div id="drive-account-row" class="hidden bg-slate-900/80 border border-emerald-500/30 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase block">Cuenta vinculada por defecto</span>
+                        <span id="drive-account-email" class="text-xs font-mono text-slate-200 truncate block">Google Drive</span>
+                    </div>
+                    <button onclick="disconnectGoogleDrive()" class="text-[10px] font-bold text-rose-400 hover:underline shrink-0">Desconectar</button>
+                </div>
+
                 <p class="text-[11px] text-slate-400 leading-snug">
                     Guardá y sincronizá automáticamente <code class="text-slate-300">hypergym_data.json</code> y <code class="text-slate-300">hypergym_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperGym_Data</code> de tu Drive.
                 </p>
@@ -1378,22 +1386,58 @@
                 console.error('Error guardando localStorage:', e);
             }
 
-            if (driveAccessToken) {
+            if (hasValidDriveToken()) {
                 clearTimeout(driveSyncTimeout);
                 if (immediateDriveSync) {
                     syncToGoogleDrive(false);
                 } else {
                     driveSyncTimeout = setTimeout(() => syncToGoogleDrive(false), 1800);
                 }
+            } else {
+                const session = getSavedDriveSession();
+                if (session.connected && immediateDriveSync) {
+                    // Al finalizar un entreno (gesto del usuario), renovamos sesión silenciosamente y subimos
+                    connectGoogleDrive(true, true);
+                }
             }
         }
 
         // ----------------------------------------------------
-        // 2B. GOOGLE DRIVE OAUTH 2.0 (GOOGLE IDENTITY SERVICES)
+        // 2B. GOOGLE DRIVE OAUTH 2.0 (PERSISTENTE + AUTO-SYNC)
         // ----------------------------------------------------
+        const DRIVE_SESSION_KEY = 'hypergym_drive_session_v1';
         let driveAccessToken = null;
+        let driveTokenExpiresAt = 0;
         let driveTokenClient = null;
         let driveFolderId = null;
+
+        function getSavedDriveSession() {
+            try {
+                return JSON.parse(localStorage.getItem(DRIVE_SESSION_KEY) || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveDriveSession(patch) {
+            const next = Object.assign(getSavedDriveSession(), patch);
+            try {
+                localStorage.setItem(DRIVE_SESSION_KEY, JSON.stringify(next));
+            } catch (e) {}
+            return next;
+        }
+
+        function clearDriveSession() {
+            driveAccessToken = null;
+            driveTokenExpiresAt = 0;
+            driveFolderId = null;
+            drivePhotosFolderId = null;
+            localStorage.removeItem(DRIVE_SESSION_KEY);
+        }
+
+        function hasValidDriveToken() {
+            return !!driveAccessToken && Date.now() < driveTokenExpiresAt;
+        }
 
         function getSavedClientId() {
             return (localStorage.getItem(CLIENT_ID_STORAGE_KEY) || localStorage.getItem('hyperhoops_google_client_id') || DEFAULT_GOOGLE_CLIENT_ID || '').trim();
@@ -1416,6 +1460,12 @@
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
                 if (pill) {
                     pill.textContent = 'Sincronizando...';
+                    pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                }
+            } else if (state === 'reconnect') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+                if (pill) {
+                    pill.textContent = 'Sesión guardada (1 clic)';
                     pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
                 }
             } else if (state === 'error') {
@@ -1442,12 +1492,21 @@
                 input.value = getSavedClientId();
             }
 
-            const connected = !!driveAccessToken;
+            const session = getSavedDriveSession();
+            const connected = hasValidDriveToken();
+            const hasSavedAccount = !!session.connected;
+
+            const accountRow = document.getElementById('drive-account-row');
+            if (accountRow) {
+                accountRow.classList.toggle('hidden', !hasSavedAccount);
+                document.getElementById('drive-account-email').textContent = session.email || 'Cuenta Google vinculada';
+            }
+
             document.getElementById('btn-sync-up').classList.toggle('hidden', !connected);
             document.getElementById('btn-sync-down').classList.toggle('hidden', !connected);
             document.getElementById('btn-connect-drive-text').textContent = connected
-                ? 'Reconectar / Cambiar Cuenta Google'
-                : 'Conectar con Google Drive';
+                ? 'Cambiar Cuenta de Google'
+                : (hasSavedAccount ? 'Reanudar Sincronización con Drive' : 'Conectar con Google Drive');
         }
 
         function openDriveModal() {
@@ -1463,14 +1522,35 @@
             m.classList.remove('flex');
         }
 
-        function connectGoogleDrive() {
+        function disconnectGoogleDrive() {
+            if (driveAccessToken && window.google?.accounts?.oauth2) {
+                try { google.accounts.oauth2.revoke(driveAccessToken); } catch (e) {}
+            }
+            clearDriveSession();
+            setSyncBadge('local', 'Local');
+            updateDriveModalUI();
+            showToast('Cuenta de Google Drive desconectada');
+        }
+
+        async function fetchDriveUserEmail() {
+            try {
+                const res = await driveApiFetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)');
+                const data = await res.json();
+                if (data?.user?.emailAddress) {
+                    saveDriveSession({ email: data.user.emailAddress });
+                    updateDriveModalUI();
+                }
+            } catch (e) {}
+        }
+
+        function connectGoogleDrive(silent = false, uploadImmediately = false) {
             if (window.location.protocol === 'file:') {
-                showToast('Abrí el HTML desde https:// (GitHub Pages/Netlify) para usar Google Drive');
+                if (!silent) showToast('Abrí el HTML desde https:// (GitHub Pages/Netlify) para usar Google Drive');
                 return;
             }
             const inputVal = (document.getElementById('google-client-id-input')?.value || '').trim() || getSavedClientId();
             if (!inputVal) {
-                showToast('Configurá tu Google OAuth Client ID primero');
+                if (!silent) showToast('Configurá tu Google OAuth Client ID primero');
                 return;
             }
             if (inputVal !== DEFAULT_GOOGLE_CLIENT_ID) {
@@ -1478,31 +1558,90 @@
             }
 
             if (!window.google || !google.accounts || !google.accounts.oauth2) {
-                showToast('Cargando librería de Google... intentá de nuevo en 2s');
+                if (!silent) showToast('Cargando librería de Google... intentá de nuevo en 2s');
                 return;
             }
+
+            const savedSession = getSavedDriveSession();
 
             driveTokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: inputVal,
                 scope: DRIVE_SCOPE,
+                hint: savedSession.email || undefined,
                 callback: async (tokenResponse) => {
                     if (tokenResponse.error) {
-                        console.error('OAuth error:', tokenResponse);
-                        setSyncBadge('error', 'Error Auth');
-                        showToast('Error al iniciar sesión con Google');
+                        console.warn('OAuth callback error:', tokenResponse);
+                        if (silent) {
+                            setSyncBadge('reconnect', 'Drive ↻');
+                            updateDriveModalUI();
+                        } else {
+                            setSyncBadge('error', 'Error Auth');
+                            showToast('Error al iniciar sesión con Google');
+                        }
                         return;
                     }
+                    const expiresInSec = parseInt(tokenResponse.expires_in) || 3500;
                     driveAccessToken = tokenResponse.access_token;
+                    driveTokenExpiresAt = Date.now() + Math.max(300, expiresInSec - 90) * 1000;
+
+                    saveDriveSession({
+                        connected: true,
+                        accessToken: driveAccessToken,
+                        expiresAt: driveTokenExpiresAt
+                    });
+
                     setSyncBadge('connected', 'Drive OK');
                     updateDriveModalUI();
-                    showToast('Google Drive conectado');
+                    if (!silent) showToast('Google Drive conectado por defecto');
 
-                    await loadFromGoogleDrive(false);
-                    await syncToGoogleDrive(false);
+                    fetchDriveUserEmail();
+                    if (uploadImmediately) {
+                        await syncToGoogleDrive(false);
+                    } else {
+                        await loadFromGoogleDrive(false);
+                        await syncToGoogleDrive(false);
+                    }
+                },
+                error_callback: () => {
+                    if (silent) {
+                        setSyncBadge('reconnect', 'Drive ↻');
+                        updateDriveModalUI();
+                    }
                 }
             });
 
-            driveTokenClient.requestAccessToken({ prompt: 'consent' });
+            // Si ya estaba vinculado antes o es silencioso, evitamos pedir consentimiento de nuevo
+            const promptMode = silent ? '' : (savedSession.connected && !hasValidDriveToken() ? '' : 'select_account');
+            driveTokenClient.requestAccessToken({ prompt: promptMode });
+        }
+
+        function initPersistentDriveSession() {
+            const session = getSavedDriveSession();
+            if (!session.connected) {
+                setSyncBadge('local', 'Local');
+                return;
+            }
+            if (session.accessToken && session.expiresAt && Date.now() < session.expiresAt) {
+                driveAccessToken = session.accessToken;
+                driveTokenExpiresAt = session.expiresAt;
+                setSyncBadge('connected', 'Drive OK');
+                updateDriveModalUI();
+                loadFromGoogleDrive(false);
+                return;
+            }
+            // Sesión guardada pero token expirado (>1h): intentar reconexión silenciosa al cargar GIS
+            setSyncBadge('reconnect', 'Drive ↻');
+            updateDriveModalUI();
+            let attempts = 0;
+            const waitGis = setInterval(() => {
+                attempts++;
+                if (window.google?.accounts?.oauth2) {
+                    clearInterval(waitGis);
+                    connectGoogleDrive(true, false);
+                } else if (attempts > 25) {
+                    clearInterval(waitGis);
+                }
+            }, 250);
         }
 
         async function driveApiFetch(url, options = {}) {
@@ -1510,9 +1649,11 @@
             const res = await fetch(url, { ...options, headers });
             if (res.status === 401) {
                 driveAccessToken = null;
-                setSyncBadge('local', 'Local');
+                driveTokenExpiresAt = 0;
+                saveDriveSession({ accessToken: null, expiresAt: 0 });
+                setSyncBadge('reconnect', 'Drive ↻');
                 updateDriveModalUI();
-                throw new Error('Token expirado. Volvé a conectar Google Drive.');
+                throw new Error('Sesión de Drive expirada. Tocá "Drive ↻" para reanudar.');
             }
             if (!res.ok) {
                 const txt = await res.text();
@@ -3455,7 +3596,7 @@
         window.onload = function() {
             loadLocalState();
             renderAll();
-            setSyncBadge('local', 'Local');
+            initPersistentDriveSession();
             updateInstallBubbleVisibility();
         };
     </script>
