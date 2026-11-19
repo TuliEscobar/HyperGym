@@ -1,6 +1,6 @@
-# 🏀 HyperHoops — Hipertrofia + Básquet Tracker
+# 🏋️ HyperGym — Tracker Universal de Gimnasio, Nutrición y Métricas
 
-Aplicación web autocontenida en **un solo archivo `.html`** diseñada para registrar entrenamientos de gimnasio (hipertrofia con sobrecarga progresiva), partidos de básquet, nutrición diaria, evolución de peso corporal y métricas interactivas — con respaldo local offline y sincronización con **Google Drive**.
+Aplicación web autocontenida en **un solo archivo `.html`** pensada para cualquier persona que quiera registrar sus entrenamientos de gimnasio, nutrición, peso corporal y métricas de progreso — con funcionamiento 100% offline y sincronización con **Google Drive**.
 
 🔗 **App en vivo (GitHub Pages):** https://tuliescobar.github.io/hyperhoops/
 
@@ -8,72 +8,57 @@ Aplicación web autocontenida en **un solo archivo `.html`** diseñada para regi
 
 ## ✨ Características principales
 
-- **Un solo archivo (`index.html`):** funciona 100% offline en el gimnasio gracias a `localStorage` y se puede instalar en el celular como app (PWA).
-- **Rutina interactiva con pesos "fantasma":**
-  - 4 días de gimnasio + modo Partido de Básquet.
-  - Cambio rápido de variantes de ejercicio/máquina.
-  - Registro por serie con peso, repeticiones, **RIR** (`RIR 2+`, `RIR 1`, `Fallo`) y sugerencia automática de subida de carga (`+2.5 kg`).
-  - Temporizador de descanso flotante con sonido (`Tone.js`) y vibración (150s compuestos / 90s analíticos).
-- **Combustible (Nutrición y Peso):**
-  - Seguimiento rápido de comidas, batido HSN y ajuste automático de calorías en días de básquet (`3200 kcal` → `3400 kcal`).
-  - Registro y gráfico de evolución de peso corporal.
+- **Un solo archivo (`index.html`):** instalable como app en Android e iPhone (PWA) y 100% funcional offline con `localStorage`.
+- **4 Programas de Entrenamiento listos para usar** *(cambiables en cualquier momento sin perder tu historial ni pesos fantasma)*:
+  1. **Hipertrofia + Deporte (4 días + Cardio/Deporte):** 4 días de hipertrofia + sesiones deportivas (básquet, fútbol, etc.) con opción de 1 o 2 partidos por semana.
+  2. **Reducción de Peso / Quema Grasa:** 3 días Full Body metabólico + Cardio Zona 2 / HIIT con metas en déficit calórico.
+  3. **Push / Pull / Legs (PPL Estándar):** clásico de 3 a 6 días (Empuje, Tirón, Pierna + Cardio opcional).
+  4. **Torso / Pierna Estándar (4 días):** frecuencia 2 equilibrada (Torso A/B + Pierna A/B).
+- **Rutina 100% editable:**
+  - **Editar cualquier ejercicio** (nombre, rango de repeticiones, tiempo de descanso o eliminarlo del día) con el botón ✏️.
+  - Cambio rápido entre variantes de máquinas/ejercicios y opción de agregar ejercicios personalizados.
+  - Registro por serie con peso, repeticiones, **RIR** (`RIR 2+`, `RIR 1`, `Fallo`), pesos "fantasma" de tu sesión anterior y sugerencia automática de sobrecarga (`+2.5 kg`).
+  - Temporizador flotante de descanso con sonido (`Tone.js`) y vibración.
+- **Perfil y Nutrición personalizables:**
+  - Editá tu estatura, peso meta, objetivo (Hipertrofia, Reducción de Peso o Recomposición), calorías diarias, proteína y bonus de cardio.
+  - Ideas rápidas de comidas y snacks adaptadas automáticamente a tu objetivo.
 - **Panel de 3 Métricas Interactivas (`Chart.js`):**
-  1. **Volumen Total por Sesión (kg):** tonelaje movido por entrenamiento y variación porcentual respecto a la sesión anterior.
-  2. **Progresión de Fuerza por Ejercicio:** curva de **1RM estimado (fórmula Epley)** y **peso máximo** filtrable por ejercicio.
-  3. **Distribución por Tipo de Día:** balance visual entre días de pesas y partidos de básquet.
+  1. **Volumen Total por Sesión (kg):** tonelaje movido y variación % vs sesión anterior.
+  2. **Progresión de Fuerza por Ejercicio:** curva de **1RM estimado (fórmula Epley)** y **peso máximo**.
+  3. **Distribución por Tipo de Sesión:** balance visual entre días de pesas y cardio/deporte.
 - **Sincronización con Google Drive (OAuth 2.0):**
-  - Cada usuario conecta su propia cuenta de Google (permiso seguro `drive.file`, solo accede a los archivos creados por la app).
-  - Crea automáticamente la carpeta `HyperHoops_Gym` en Google Drive con:
-    - `hyperhoops_data.json`: respaldo completo para restaurar en cualquier dispositivo.
-    - `hyperhoops_metricas.csv`: tabla lista para abrir en **Google Sheets** y armar gráficas personalizadas.
-- **Importar / Exportar JSON y CSV:** permite migrar historiales previos y descargar respaldos locales en 1 toque.
+  - Cada usuario conecta su propia cuenta de Google (permiso seguro `drive.file`).
+  - Guarda automáticamente en `Google Drive / HyperGym_Data`:
+    - `hypergym_data.json`: respaldo completo para restaurar en cualquier celular.
+    - `hypergym_metricas.csv`: tabla lista para abrir en **Google Sheets** y crear tus propias métricas.
 
 ---
 
 ## 📱 Cómo instalarla en tu celular
 
 1. Abrí **https://tuliescobar.github.io/hyperhoops/** desde el navegador del celular:
-   - **Android (Chrome):** tocá el menú `⋮` → **Instalar aplicación** o **Añadir a pantalla de inicio**.
-   - **iPhone (Safari):** tocá el botón **Compartir** (`↑`) → **Añadir a pantalla de inicio**.
-2. Se abrirá a pantalla completa como una app nativa y guardará tus datos localmente aunque no tengas señal en el gimnasio.
+   - **Android (Chrome):** menú `⋮` → **Instalar aplicación** / **Añadir a pantalla de inicio**.
+   - **iPhone (Safari):** botón **Compartir** (`↑`) → **Añadir a pantalla de inicio**.
 
 ---
 
 ## ☁️ Cómo activar Google Drive (OAuth 2.0)
 
-Para que la app pueda guardar `hyperhoops_data.json` y `hyperhoops_metricas.csv` en Google Drive:
-
 1. Entrá a [Google Cloud Console](https://console.cloud.google.com/) y creá un proyecto (gratis).
-2. En **APIs & Services → Library**, buscá y habilitá **Google Drive API**.
+2. En **APIs & Services → Library**, habilitá **Google Drive API**.
 3. En **APIs & Services → OAuth consent screen**:
-   - Elegí **External** y completá el nombre de la app (`HyperHoops`) y tu correo.
-   - En **Test users**, agregá tu correo de Gmail (y los correos de cualquier persona con la que quieras compartirla, o publicá la app).
-4. En **APIs & Services → Credentials → Create Credentials → OAuth client ID**:
-   - Tipo de aplicación: **Web application**.
+   - Elegí **External**, completá el nombre (`HyperGym`) y tu correo.
+   - En **Test users**, agregá tu correo de Gmail (y los correos de quienes quieras que la prueben, o publicá la app).
+4. En **APIs & Services → Credentials → Create Credentials → OAuth client ID → Web application**:
    - En **Authorized JavaScript origins**, agregá exactamente:
      ```
      https://tuliescobar.github.io
      ```
-   - Copiá el **Client ID** generado (`xxxx.apps.googleusercontent.com`).
-5. Pegá ese Client ID dentro de la app tocando el botón **Local** (arriba a la izquierda) → **Google OAuth Client ID** → **Conectar con Google Drive**.
-   - *(Opcional)* Si querés que cualquier persona que abra tu enlace pueda conectarse sin pegar el Client ID, pegalo en la constante `DEFAULT_GOOGLE_CLIENT_ID` al inicio del `<script>` en `index.html`.
+   - Copiá el **Client ID** (`xxxx.apps.googleusercontent.com`).
+5. Pegá el Client ID dentro de la app tocando **Local** (arriba a la izquierda) → **Google OAuth Client ID** → **Conectar con Google Drive** *(o dejalo fijo en `DEFAULT_GOOGLE_CLIENT_ID` en `index.html`)*.
 
 ---
 
-## 🔄 Cómo importar tu historial anterior (desde Gemini Canvas)
+## 🔄 Importar historial previo
 
-1. En el chat original de Gemini donde usabas la app, pedile:
-   > *"Agregá un botón 'Exportar JSON' en la pestaña Historial que copie al portapapeles `JSON.stringify(appState)`."*
-2. Copiá el JSON generado.
-3. En HyperHoops, tocá **Local / Drive** (arriba a la izquierda) → **Pegar JSON** → **Cargar Historial Pegado**.
-
----
-
-## 🛠️ Tecnologías usadas
-
-- HTML5 + JavaScript Vanilla (single-file)
-- [Tailwind CSS](https://tailwindcss.com/) (CDN)
-- [Phosphor Icons](https://phosphoricons.com/)
-- [Chart.js](https://www.chartjs.org/)
-- [Tone.js](https://tonejs.github.io/)
-- [Google Identity Services + Google Drive API v3](https://developers.google.com/drive)
+Tocá el botón **Local / Drive** (arriba a la izquierda) → **Importar JSON** o **Pegar JSON** para cargar cualquier respaldo anterior (compatible con versiones previas de HyperHoops / Gemini Canvas).

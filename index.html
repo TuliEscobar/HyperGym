@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HyperHoops | Hipertrofia + Básquet Tracker</title>
+    <title>HyperGym | Tracker de Entrenamiento, Nutrición y Métricas</title>
 
     <!-- PWA & Mobile Install Meta Tags -->
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="HyperHoops">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='6' y='6' width='88' height='88' rx='20' fill='none' stroke='%2310b981' stroke-width='5'/%3E%3Ctext x='50' y='66' font-size='48' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230f172a'/%3E%3Crect x='10' y='10' width='160' height='160' rx='34' fill='none' stroke='%2310b981' stroke-width='8'/%3E%3Ctext x='90' y='118' font-size='84' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E">
+    <meta name="apple-mobile-web-app-title" content="HyperGym">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='6' y='6' width='88' height='88' rx='20' fill='none' stroke='%2310b981' stroke-width='5'/%3E%3Ctext x='50' y='66' font-size='48' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230f172a'/%3E%3Crect x='10' y='10' width='160' height='160' rx='34' fill='none' stroke='%2310b981' stroke-width='8'/%3E%3Ctext x='90' y='118' font-size='84' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -85,28 +85,33 @@
 
     <!-- HEADER SUPERIOR -->
     <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <button onclick="openProfileModal()" title="Editar Perfil y Objetivos" class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 active:scale-95 transition">
                     <i class="ph-bold ph-barbell text-xl"></i>
-                </div>
-                <div>
+                </button>
+                <div class="min-w-0">
                     <div class="flex items-center gap-2">
-                        <h1 class="font-extrabold text-base tracking-tight text-white">HYPER<span class="text-emerald-400">HOOPS</span></h1>
-                        <button onclick="openDriveModal()" id="sync-badge" title="Configurar Google Drive y Respaldo" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 transition active:scale-95">
+                        <h1 class="font-extrabold text-base tracking-tight text-white">HYPER<span class="text-emerald-400">GYM</span></h1>
+                        <button onclick="openDriveModal()" id="sync-badge" title="Google Drive y Respaldo" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 transition active:scale-95">
                             <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                             <span id="sync-label">Local</span>
                         </button>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-medium">1.85m • <span id="header-weight" class="text-slate-200 font-mono">75.0 kg</span> • Meta: <span id="header-kcal" class="text-amber-400 font-mono">3200 kcal</span></p>
+                    <button onclick="openProfileModal()" class="text-[11px] text-slate-400 hover:text-slate-200 font-medium truncate flex items-center gap-1 text-left">
+                        <span id="header-height">1.80m</span> •
+                        <span id="header-weight" class="text-slate-200 font-mono">75.0 kg</span> •
+                        <span id="header-kcal" class="text-amber-400 font-mono">2600 kcal</span>
+                        <i class="ph-bold ph-pencil-simple text-[10px] text-slate-500"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- Botón rápido de estado nutricional del día -->
-            <button onclick="switchTab('combustible')" class="bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 transition active:scale-95">
+            <button onclick="switchTab('combustible')" class="bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 transition active:scale-95 shrink-0">
                 <div class="text-right">
-                    <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Proteína Hoy</div>
-                    <div class="text-xs font-mono font-bold text-emerald-400"><span id="header-prot">0</span>/155g</div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Proteína</div>
+                    <div class="text-xs font-mono font-bold text-emerald-400"><span id="header-prot">0</span>/<span id="header-prot-target">150</span>g</div>
                 </div>
                 <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                     <i class="ph-fill ph-lightning text-base"></i>
@@ -123,17 +128,17 @@
         <!-- ========================================== -->
         <section id="tab-entrenar" class="space-y-4">
 
-            <!-- Banner de recomendación según el día de la semana -->
-            <div id="today-suggestion-banner" class="bg-gradient-to-r from-slate-800/90 via-slate-800/70 to-emerald-950/40 border border-slate-700/80 rounded-2xl p-3 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <i class="ph-fill ph-calendar-check text-emerald-400 text-xl"></i>
-                    <div>
-                        <div class="text-[11px] text-slate-400 font-medium" id="banner-week-mode">Modo: Semana Estándar</div>
-                        <div class="text-xs font-bold text-slate-100" id="banner-today-plan">Hoy es un gran día para darle duro</div>
+            <!-- Banner del programa activo y recomendación de hoy -->
+            <div id="today-suggestion-banner" class="bg-gradient-to-r from-slate-800/90 via-slate-800/70 to-emerald-950/40 border border-slate-700/80 rounded-2xl p-3 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <i class="ph-fill ph-calendar-check text-emerald-400 text-xl shrink-0"></i>
+                    <div class="min-w-0">
+                        <div class="text-[11px] text-slate-400 font-medium truncate" id="banner-week-mode">Programa: Hipertrofia</div>
+                        <div class="text-xs font-bold text-slate-100 truncate" id="banner-today-plan">Hoy es un gran día para entrenar</div>
                     </div>
                 </div>
-                <button onclick="switchTab('calendario')" class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg active:scale-95">
-                    Cambiar
+                <button onclick="switchTab('calendario')" class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg active:scale-95 shrink-0">
+                    Programas
                 </button>
             </div>
 
@@ -141,18 +146,18 @@
             <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1" id="day-selector-container"></div>
 
             <!-- Cabecera del Día Seleccionado -->
-            <div id="workout-day-header" class="bg-slate-800/60 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between">
+            <div id="workout-day-header" class="bg-slate-800/60 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-2">
                 <div>
-                    <h2 id="day-title" class="font-bold text-base text-white">Día 1: Empuje + Cuádriceps</h2>
+                    <h2 id="day-title" class="font-bold text-base text-white">Día 1</h2>
                     <p id="day-subtitle" class="text-xs text-slate-400 mt-0.5">RIR 1-2 en básicos • RIR 0 última serie analíticos</p>
                 </div>
-                <div class="text-right">
+                <div class="text-right shrink-0">
                     <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Volumen Hoy</span>
                     <span id="current-session-volume" class="font-mono font-bold text-sm text-emerald-400">0 kg</span>
                 </div>
             </div>
 
-            <!-- Lista de Ejercicios o Vista de Básquet -->
+            <!-- Lista de Ejercicios o Vista de Cardio/Deporte -->
             <div id="exercises-list" class="space-y-3.5"></div>
 
             <!-- Botón para agregar ejercicio extra -->
@@ -179,14 +184,14 @@
 
             <!-- Tarjeta Resumen de Macros del Día -->
             <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3.5">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <div>
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Superávit Hipertrofia</span>
+                        <span id="fuel-goal-badge" class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Objetivo Activo</span>
                         <h2 class="text-lg font-extrabold text-white">Combustible Diario</h2>
                     </div>
-                    <button onclick="toggleBasketBonusToday()" id="basket-calorie-toggle" class="px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition active:scale-95">
-                        <i class="ph-fill ph-basketball text-base"></i>
-                        <span id="basket-toggle-label">Día Normal (3200 kcal)</span>
+                    <button onclick="toggleCardioBonusToday()" id="basket-calorie-toggle" class="px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition active:scale-95 shrink-0">
+                        <i class="ph-fill ph-sneaker-move text-base"></i>
+                        <span id="basket-toggle-label">Día Normal</span>
                     </button>
                 </div>
 
@@ -194,7 +199,7 @@
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs">
                         <span class="text-slate-300 font-medium">Calorías Estimadas</span>
-                        <span class="font-mono font-bold text-amber-400"><span id="fuel-kcal-current">0</span> / <span id="fuel-kcal-target">3200</span> kcal</span>
+                        <span class="font-mono font-bold text-amber-400"><span id="fuel-kcal-current">0</span> / <span id="fuel-kcal-target">2600</span> kcal</span>
                     </div>
                     <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700/60">
                         <div id="fuel-kcal-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
@@ -204,27 +209,33 @@
                 <!-- Barra de Proteína -->
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs">
-                        <span class="text-slate-300 font-medium">Proteína Total (1.8 - 2.2g/kg)</span>
-                        <span class="font-mono font-bold text-emerald-400"><span id="fuel-prot-current">0</span> / 155 g</span>
+                        <span class="text-slate-300 font-medium">Proteína Total (1.6 - 2.2g/kg)</span>
+                        <span class="font-mono font-bold text-emerald-400"><span id="fuel-prot-current">0</span> / <span id="fuel-prot-target">150</span> g</span>
                     </div>
                     <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700/60">
                         <div id="fuel-prot-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
+
+                <div class="flex justify-end">
+                    <button onclick="openProfileModal()" class="text-[11px] font-semibold text-slate-400 hover:text-emerald-400 flex items-center gap-1">
+                        <i class="ph-bold ph-sliders-horizontal"></i> Personalizar metas de calorías y proteína
+                    </button>
+                </div>
             </div>
 
-            <!-- Checkboxes de 1-Toque (Comidas + Suplementación HSN) -->
+            <!-- Checkboxes de 1-Toque -->
             <div class="space-y-2.5">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Checks Rápidos de Hoy</h3>
                 <div id="nutrition-checks-list" class="space-y-2"></div>
             </div>
 
-            <!-- Generador de Ideas para la 4.ª Comida / Extra Calórico -->
+            <!-- Generador de Ideas según Objetivo (Volumen / Definición / Mantenimiento) -->
             <div class="bg-slate-800/60 border border-amber-500/30 rounded-2xl p-4 space-y-2.5">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <i class="ph-fill ph-lightbulb text-amber-400 text-lg"></i>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Salvavidas 4.ª Comida (En 2 min)</h4>
+                        <h4 id="quick-meal-title" class="text-xs font-bold uppercase tracking-wider text-amber-400">Idea Rápida (En 2 min)</h4>
                     </div>
                     <button onclick="cycleQuickMealIdea()" class="text-xs font-semibold text-slate-300 bg-slate-700/70 hover:bg-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1 active:scale-95">
                         <i class="ph-bold ph-arrows-clockwise"></i> Otra idea
@@ -235,10 +246,10 @@
 
             <!-- Evolución del Peso Corporal -->
             <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <div>
                         <h3 class="text-sm font-bold text-white">Evolución Peso Corporal</h3>
-                        <p class="text-[11px] text-slate-400">Arranque: 75.0 kg (1.85m) • Meta fase 1: 78.5 kg</p>
+                        <p id="weight-goal-subtitle" class="text-[11px] text-slate-400">Meta actual: 78.0 kg</p>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <input id="weight-input" type="number" step="0.1" value="75.0" class="w-20 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-center font-mono text-sm font-bold text-white focus:outline-none focus:border-emerald-500">
@@ -288,9 +299,7 @@
                 </div>
             </div>
 
-            <!-- ========================================== -->
-            <!-- 3 MÉTRICAS INTERACTIVAS (CHART.JS)         -->
-            <!-- ========================================== -->
+            <!-- 3 MÉTRICAS INTERACTIVAS (CHART.JS) -->
             <div class="space-y-3">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1 flex items-center gap-1.5">
                     <i class="ph-fill ph-chart-bar text-emerald-400"></i> Panel de Métricas
@@ -338,14 +347,14 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <span class="text-[10px] font-mono uppercase text-sky-400 font-bold">Métrica 3 • Balance</span>
-                            <h4 class="text-sm font-extrabold text-white">Distribución por Tipo de Día</h4>
+                            <h4 class="text-sm font-extrabold text-white">Distribución por Tipo de Sesión</h4>
                         </div>
-                        <span id="metric3-basket-ratio" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-sky-300 border border-slate-700">Gym / Básquet</span>
+                        <span id="metric3-basket-ratio" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-sky-300 border border-slate-700">Pesas / Cardio</span>
                     </div>
                     <div class="relative h-44 w-full">
                         <canvas id="chart-distribution"></canvas>
                         <div id="chart-distribution-empty" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-500 text-center px-4">
-                            Acá verás qué días entrenás más (Empuje, Tracción, Full Body, Torso y Básquet).
+                            Acá verás qué días entrenás más (Empuje, Tracción, Pierna, Full Body, Cardio/Deporte).
                         </div>
                     </div>
                 </div>
@@ -368,43 +377,45 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- PESTAÑA 4: CALENDARIO (MODO DE SEMANA)     -->
+        <!-- PESTAÑA 4: PROGRAMAS Y CALENDARIO          -->
         <!-- ========================================== -->
         <section id="tab-calendario" class="hidden space-y-4 pb-8">
             <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Adaptación Inteligente</span>
-                <h2 class="text-lg font-extrabold text-white">Planificador Gimnasio + Básquet</h2>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Elegí tu Plan</span>
+                        <h2 class="text-lg font-extrabold text-white">Programas de Entrenamiento</h2>
+                    </div>
+                    <button onclick="openProfileModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-slate-200 flex items-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-user-gear text-emerald-400"></i> Perfil
+                    </button>
+                </div>
                 <p class="text-xs text-slate-300 leading-relaxed">
-                    Elegí qué tipo de semana tenés para acomodar los descansos y nunca llegar con las piernas cargadas al partido del jueves.
+                    Cambiá de rutina cuando quieras según tu objetivo. Tu historial de sesiones y tus pesos fantasma se conservan siempre.
                 </p>
 
-                <!-- Botones de Modo de Semana -->
-                <div class="grid grid-cols-1 gap-2.5 pt-1">
-                    <button onclick="setWeekMode('standard')" id="mode-btn-standard" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between">
-                        <div>
-                            <div class="font-bold text-sm text-white flex items-center gap-2">
-                                <span>Semana Estándar (Básquet Jueves)</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Lun Día 1 • Mar Día 2 • Mié Descanso/Día 4 • Jue Básquet • Vie Día 3</p>
-                        </div>
-                        <i class="ph-fill ph-check-circle text-xl text-emerald-400" id="check-mode-standard"></i>
-                    </button>
+                <!-- Selector de Programas -->
+                <div id="program-selector-list" class="grid grid-cols-1 gap-2.5 pt-1"></div>
+            </div>
 
-                    <button onclick="setWeekMode('double')" id="mode-btn-double" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between">
-                        <div>
-                            <div class="font-bold text-sm text-white flex items-center gap-2">
-                                <span>Semana Doble Partido (Lun y Jue)</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Lun Básquet • Mar Día 1 • Mié Día 2 • Jue Básquet • Vie Día 3 • Sáb Día 4</p>
-                        </div>
-                        <i class="ph-fill ph-check-circle text-xl text-emerald-400 hidden" id="check-mode-double"></i>
+            <!-- Sub-selector de Modo de Semana (solo visible en Hipertrofia + Deporte) -->
+            <div id="week-mode-card" class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-4 space-y-2.5 hidden">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Adaptación de Partidos / Deporte</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setWeekMode('standard')" id="mode-btn-standard" class="p-3 rounded-xl border text-left transition">
+                        <div class="font-bold text-xs text-white">1 Partido / Semana</div>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Deporte Jueves</p>
+                    </button>
+                    <button onclick="setWeekMode('double')" id="mode-btn-double" class="p-3 rounded-xl border text-left transition">
+                        <div class="font-bold text-xs text-white">Doble Partido</div>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Deporte Lun y Jue</p>
                     </button>
                 </div>
             </div>
 
             <!-- Grilla Semanal Interactiva -->
             <div class="space-y-2">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Estructura de la Semana</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Estructura Semanal Sugerida</h3>
                 <div id="weekly-schedule-grid" class="space-y-2"></div>
             </div>
         </section>
@@ -437,6 +448,65 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- MODAL: PERFIL Y OBJETIVOS DEL USUARIO      -->
+    <!-- ========================================== -->
+    <div id="modal-profile" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl my-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-user-circle-gear text-2xl text-emerald-400"></i>
+                    <h3 class="font-extrabold text-base text-white">Tu Perfil y Metas</h3>
+                </div>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold block mb-1">Objetivo Principal</label>
+                    <select id="prof-goal" onchange="applyGoalPresetToInputs()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
+                        <option value="hypertrophy">💪 Ganar Masa Muscular (Superávit)</option>
+                        <option value="fatloss">🔥 Reducción de Peso / Definición (Déficit)</option>
+                        <option value="recomp">⚖️ Mantenimiento / Recomposición</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Estatura (m)</label>
+                        <input id="prof-height" type="number" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-white">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Peso Meta (kg)</label>
+                        <input id="prof-target-weight" type="number" step="0.5" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 font-semibold block mb-1">Kcal / Día</label>
+                        <input id="prof-kcal" type="number" step="50" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 font-semibold block mb-1">Prot (g)</label>
+                        <input id="prof-prot" type="number" step="5" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 font-semibold block mb-1">+Kcal Cardio</label>
+                        <input id="prof-cardio-bonus" type="number" step="50" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button onclick="closeProfileModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
+                <button onclick="saveProfileSettings()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-extrabold">Guardar Perfil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- MODAL: GOOGLE DRIVE OAUTH + IMPORTAR/EXP   -->
     <!-- ========================================== -->
     <div id="modal-drive" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
@@ -453,7 +523,7 @@
 
             <!-- Aviso si está abierto como file:// -->
             <div id="drive-file-warning" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-[11px] text-amber-200 leading-relaxed">
-                <strong>Nota importante:</strong> Estás abriendo el archivo localmente (<code class="font-mono">file://</code>). Google bloquea el inicio de sesión OAuth desde archivos locales. Para conectar Google Drive, subí este único <code class="font-mono">.html</code> gratis a <strong>GitHub Pages</strong> o <strong>Netlify</strong> (<code class="font-mono">https://</code>). Mientras tanto, todo se guarda automáticamente en tu celular y podés exportar/importar JSON y CSV abajo.
+                <strong>Nota importante:</strong> Estás abriendo el archivo localmente (<code class="font-mono">file://</code>). Google bloquea el inicio de sesión OAuth desde archivos locales. Para conectar Google Drive, abrilo desde <strong>https://</strong> (GitHub Pages o Netlify). Mientras tanto, todo se guarda automáticamente en tu celular y podés exportar/importar JSON y CSV abajo.
             </div>
 
             <!-- Estado de conexión Google Drive -->
@@ -466,7 +536,7 @@
                 <div>
                     <label class="text-[11px] text-slate-400 font-semibold block mb-1">Google OAuth Client ID</label>
                     <input id="google-client-id-input" type="text" placeholder="123456789-xxxx.apps.googleusercontent.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
-                    <p class="text-[10px] text-slate-500 mt-1">Se guarda en tu navegador. Guarda <code class="text-slate-300">hyperhoops_data.json</code> y <code class="text-slate-300">hyperhoops_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperHoops_Gym</code> de tu Drive.</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Guarda <code class="text-slate-300">hypergym_data.json</code> y <code class="text-slate-300">hypergym_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperGym_Data</code> de tu Drive.</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
@@ -484,11 +554,11 @@
                 <p id="drive-last-sync" class="text-[10px] text-slate-400 text-center hidden"></p>
             </div>
 
-            <!-- Importar / Exportar Historial (Migración desde Gemini + CSV) -->
+            <!-- Importar / Exportar Historial -->
             <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-2.5">
                 <span class="text-xs font-bold text-white block">Importar / Exportar Historial</span>
                 <p class="text-[11px] text-slate-400 leading-snug">
-                    Cargá tu historial anterior (JSON exportado desde Gemini) o descargá tus entrenamientos en CSV para abrir en Google Sheets / Excel.
+                    Cargá tu historial anterior (JSON exportado) o descargá tus entrenamientos en CSV para abrir en Google Sheets / Excel.
                 </p>
 
                 <div class="grid grid-cols-2 gap-2">
@@ -501,7 +571,6 @@
                     </button>
                 </div>
 
-                <!-- Caja opcional para pegar JSON directamente -->
                 <div id="paste-import-box" class="hidden space-y-2 pt-1">
                     <textarea id="paste-json-textarea" rows="4" placeholder='Pegá acá el texto JSON de tu historial anterior...' class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
                     <button onclick="handleImportPastedJson()" class="w-full py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
@@ -559,6 +628,46 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- MODAL: EDITAR EJERCICIO                    -->
+    <!-- ========================================== -->
+    <div id="modal-edit-exercise" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-white">Editar Ejercicio</h3>
+                <button onclick="closeEditExerciseModal()" class="text-slate-400 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold block mb-1">Nombre del Ejercicio</label>
+                    <input id="edit-ex-name" type="text" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Rango Reps</label>
+                        <input id="edit-ex-reps" type="text" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Tipo Descanso</label>
+                        <select id="edit-ex-type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                            <option value="compound">Compuesto (150s)</option>
+                            <option value="isolation">Analítico (90s)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-1">
+                <button onclick="deleteEditingExercise()" class="px-3 py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center justify-center" title="Quitar ejercicio del día">
+                    <i class="ph-bold ph-trash text-sm"></i>
+                </button>
+                <button onclick="closeEditExerciseModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
+                <button onclick="confirmEditExercise()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-extrabold">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- MODAL: CELEBRACIÓN FIN DE ENTRENAMIENTO    -->
     <!-- ========================================== -->
     <div id="modal-celebration" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
@@ -569,7 +678,7 @@
             <div>
                 <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-bold">¡Sesión Guardada!</span>
                 <h3 id="celebration-title" class="text-xl font-extrabold text-white mt-1">Entrenamiento Completado</h3>
-                <p id="celebration-subtitle" class="text-xs text-slate-400 mt-1">Los pesos quedaron grabados como referencia fantasma para la semana que viene.</p>
+                <p id="celebration-subtitle" class="text-xs text-slate-400 mt-1">Los pesos quedaron grabados como referencia fantasma para tu próxima sesión.</p>
             </div>
             <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 grid grid-cols-2 gap-2">
                 <div>
@@ -582,13 +691,13 @@
                 </div>
             </div>
             <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left flex items-center gap-2.5">
-                <i class="ph-fill ph-jar text-amber-400 text-2xl shrink-0"></i>
-                <p class="text-[11px] text-amber-200 leading-tight">
-                    <strong>Recordatorio Post-Entreno:</strong> Tomá tus 45-50g de Soja HSN + 60g Evocarbs y marcalo en la pestaña Combustible.
+                <i class="ph-fill ph-lightning text-amber-400 text-2xl shrink-0"></i>
+                <p id="celebration-tip" class="text-[11px] text-amber-200 leading-tight">
+                    <strong>Post-Entreno:</strong> Hidratate bien y registrá tu comida o batido proteico en la pestaña Combustible.
                 </p>
             </div>
             <button onclick="closeCelebrationModal()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-sm">
-                Ir a Marcar mi Batido HSN
+                Ir a Combustible
             </button>
         </div>
     </div>
@@ -600,7 +709,7 @@
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xs w-full p-5 text-center space-y-4">
             <i class="ph-fill ph-warning-circle text-3xl text-rose-400"></i>
             <h3 class="font-bold text-base text-white">¿Reiniciar historial?</h3>
-            <p class="text-xs text-slate-400">Se restaurarán los pesos sugeridos iniciales para 75 kg y se borrarán las sesiones pasadas.</p>
+            <p class="text-xs text-slate-400">Se borrarán las sesiones pasadas y se restaurarán los pesos iniciales sugeridos del programa actual.</p>
             <div class="flex gap-2">
                 <button onclick="closeResetConfirmModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
                 <button onclick="confirmResetAllData()" class="flex-1 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold">Reiniciar</button>
@@ -635,7 +744,7 @@
             </button>
             <button onclick="switchTab('calendario')" id="nav-calendario" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
                 <i class="ph-fill ph-calendar-blank text-xl"></i>
-                <span class="text-[11px] font-medium mt-0.5">Calendario</span>
+                <span class="text-[11px] font-medium mt-0.5">Programas</span>
             </button>
         </div>
     </nav>
@@ -645,25 +754,26 @@
     <!-- ========================================== -->
     <script>
         // ----------------------------------------------------
-        // 0. CONFIGURACIÓN OPCIONAL DE GOOGLE OAUTH CLIENT ID
+        // 0. CONFIGURACIÓN DE GOOGLE OAUTH CLIENT ID
         // (Si pegás tu Client ID acá, cualquiera que abra este .html
         //  podrá tocar "Conectar con Google Drive" sin configurarlo)
         // ----------------------------------------------------
         const DEFAULT_GOOGLE_CLIENT_ID = '';
 
-        const STORAGE_KEY = 'hyperhoops_app_state_v2';
-        const CLIENT_ID_STORAGE_KEY = 'hyperhoops_google_client_id';
-        const DRIVE_FOLDER_NAME = 'HyperHoops_Gym';
-        const DRIVE_JSON_FILENAME = 'hyperhoops_data.json';
-        const DRIVE_CSV_FILENAME = 'hyperhoops_metricas.csv';
+        const STORAGE_KEY = 'hypergym_app_state_v3';
+        const LEGACY_STORAGE_KEY = 'hyperhoops_app_state_v2';
+        const CLIENT_ID_STORAGE_KEY = 'hypergym_google_client_id';
+        const DRIVE_FOLDER_NAME = 'HyperGym_Data';
+        const DRIVE_JSON_FILENAME = 'hypergym_data.json';
+        const DRIVE_CSV_FILENAME = 'hypergym_metricas.csv';
         const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
         // Generar manifest PWA dinámico en un solo archivo
         (function injectInlineManifest() {
             try {
                 const manifest = {
-                    name: 'HyperHoops | Hipertrofia + Básquet',
-                    short_name: 'HyperHoops',
+                    name: 'HyperGym | Entrenamiento y Métricas',
+                    short_name: 'HyperGym',
                     start_url: '.',
                     display: 'standalone',
                     background_color: '#0f172a',
@@ -671,7 +781,7 @@
                     orientation: 'portrait',
                     icons: [
                         {
-                            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f172a'/%3E%3Crect x='10' y='10' width='172' height='172' rx='36' fill='none' stroke='%2310b981' stroke-width='10'/%3E%3Ctext x='96' y='125' font-size='86' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E",
+                            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f172a'/%3E%3Crect x='10' y='10' width='172' height='172' rx='36' fill='none' stroke='%2310b981' stroke-width='10'/%3E%3Ctext x='96' y='125' font-size='86' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E",
                             sizes: '192x192',
                             type: 'image/svg+xml'
                         }
@@ -685,413 +795,315 @@
             } catch (e) {}
         })();
 
+        // Helper para crear series limpias
+        function makeSets(count, lastRir = 1) {
+            const arr = [];
+            for (let i = 0; i < count; i++) {
+                arr.push({ weight: '', reps: '', rir: i === count - 1 ? lastRir : 1, done: false });
+            }
+            return arr;
+        }
+
         // ----------------------------------------------------
-        // 1. BASE DE DATOS DE RUTINA INICIAL (75kg / 1.85m)
+        // 1. CATÁLOGO DE PROGRAMAS DE ENTRENAMIENTO (PARA TODOS)
         // ----------------------------------------------------
-        const INITIAL_ROUTINE = {
-            day1: {
-                id: 'day1',
-                shortName: 'Día 1: Empuje/Cuád',
-                title: 'Día 1: Énfasis Empuje + Cuádriceps',
-                subtitle: 'Básicos RIR 1-2 (150s) • Analíticos RIR 0 última serie (90s)',
-                exercises: [
-                    {
-                        id: 'd1_ex1',
-                        variants: ['Sentadilla Libre', 'Hack Squat', 'Prensa 45°'],
-                        selectedVariant: 0,
-                        targetReps: '6-8 reps',
-                        type: 'compound',
-                        defaultWeight: 70,
-                        defaultReps: 8,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+        const TRAINING_PROGRAMS = {
+            hypertrophy_sport: {
+                id: 'hypertrophy_sport',
+                name: 'Hipertrofia + Deporte (4 días)',
+                badge: 'Volumen / Híbrido',
+                goal: 'hypertrophy',
+                description: '4 días de hipertrofia inteligente + día de deporte/cardio sin sobrecargar piernas.',
+                recommendedProfile: { goal: 'hypertrophy', kcalTarget: 3000, proteinTarget: 155, cardioBonusKcal: 250 },
+                hasWeekModes: true,
+                routine: {
+                    day1: {
+                        id: 'day1',
+                        shortName: 'Día 1: Empuje/Cuád',
+                        title: 'Día 1: Énfasis Empuje + Cuádriceps',
+                        subtitle: 'Básicos RIR 1-2 (150s) • Analíticos RIR 0 última serie (90s)',
+                        exercises: [
+                            { id: 'd1_ex1', variants: ['Sentadilla Libre', 'Hack Squat', 'Prensa 45°'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 60, defaultReps: 8, sets: makeSets(3, 1) },
+                            { id: 'd1_ex2', variants: ['Press Banca Plano Barra', 'Press Plano Mancuernas'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 55, defaultReps: 8, sets: makeSets(3, 1) },
+                            { id: 'd1_ex3', variants: ['Remo Polea Baja Neutro', 'Remo con Barra', 'Remo en Máquina'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 50, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd1_ex4', variants: ['Press Militar Mancuernas', 'Press Hombros Máquina'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 16, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd1_ex5', variants: ['Curl Femoral Tumbado', 'Curl Femoral Sentado'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 35, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'd1_ex6', variants: ['Tríceps en Polea con Soga', 'Tríceps Barra Recta'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 20, defaultReps: 12, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd1_ex2',
-                        variants: ['Press Banca Plano Barra', 'Press Plano Mancuernas'],
-                        selectedVariant: 0,
-                        targetReps: '6-8 reps',
-                        type: 'compound',
-                        defaultWeight: 60,
-                        defaultReps: 8,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day2: {
+                        id: 'day2',
+                        shortName: 'Día 2: Tracción/Isquios',
+                        title: 'Día 2: Énfasis Tracción + Bisagra Cadera',
+                        subtitle: 'Controlá la bajada en Peso Muerto Rumano • RIR 1-2',
+                        exercises: [
+                            { id: 'd2_ex1', variants: ['Peso Muerto Rumano Barra', 'Peso Muerto Rumano Mancuernas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 65, defaultReps: 8, sets: makeSets(3, 1) },
+                            { id: 'd2_ex2', variants: ['Jalón al Pecho Prono', 'Dominadas Libres / Lastradas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 55, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd2_ex3', variants: ['Press Inclinado Mancuernas 30°', 'Press Inclinado Multipower'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 20, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd2_ex4', variants: ['Sillón de Cuádriceps (Extensiones)'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 45, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'd2_ex5', variants: ['Elevaciones Laterales Mancuernas', 'Elevaciones Laterales Polea'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 10, defaultReps: 14, sets: makeSets(4, 0) },
+                            { id: 'd2_ex6', variants: ['Curl Bíceps Barra Z', 'Curl Mancuernas Banco Inclinado'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 25, defaultReps: 10, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd1_ex3',
-                        variants: ['Remo Polea Baja Neutro', 'Remo con Barra', 'Remo en Máquina'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 55,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day3: {
+                        id: 'day3',
+                        shortName: 'Día 3: Full Body',
+                        title: 'Día 3: Full Body Híbrido',
+                        subtitle: 'Estímulo global de cuerpo completo con buena recuperación',
+                        exercises: [
+                            { id: 'd3_ex1', variants: ['Prensa de Piernas 45°', 'Sentadilla Búlgara Mancuernas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 120, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd3_ex2', variants: ['Fondos en Paralelas', 'Press Máquina Convergente'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 60, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd3_ex3', variants: ['Remo a 1 Brazo con Mancuerna', 'Remo en Punta (T-Bar)'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 24, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd3_ex4', variants: ['Hip Thrust con Barra', 'Curl Femoral Sentado'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 80, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd3_ex5', variants: ['Face Pull en Polea Alta', 'Pájaros en Máquina (Deltoides Post.)'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 22.5, defaultReps: 15, sets: makeSets(3, 0) },
+                            { id: 'd3_ex6', variants: ['Superserie: Martillo + Ext. Tras Nuca', 'Superserie: Martillo + Press Francés'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 12, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'd3_ex7', variants: ['Gemelos de Pie en Máquina', 'Gemelos Sentado'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 55, defaultReps: 15, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd1_ex4',
-                        variants: ['Press Militar Mancuernas', 'Press Hombros Máquina'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 18,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day4: {
+                        id: 'day4',
+                        shortName: 'Día 4: Torso/Brazos',
+                        title: 'Día 4 (Opcional): Torso + Brazos + Estética',
+                        subtitle: 'Sin fatiga de piernas • Enfoque en pecho, espalda, hombros y brazos',
+                        exercises: [
+                            { id: 'd4_ex1', variants: ['Cruces en Polea Alta', 'Aperturas en Pec Deck'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 18, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'd4_ex2', variants: ['Jalón Agarre Estrecho Neutro', 'Jalón Supino'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 50, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'd4_ex3', variants: ['Elevaciones Laterales en Polea', 'Elevaciones Laterales Mancuernas'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 7.5, defaultReps: 15, sets: makeSets(4, 0) },
+                            { id: 'd4_ex4', variants: ['Curl Bíceps Banco Scott', 'Spider Curl con Mancuernas'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 22.5, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'd4_ex5', variants: ['Tríceps Unilateral en Polea', 'Fondos entre Bancos'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 10, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'd4_ex6', variants: ['Crunch Abdominal en Polea Alta', 'Elevaciones de Piernas Colgado'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 30, defaultReps: 15, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd1_ex5',
-                        variants: ['Curl Femoral Tumbado', 'Curl Femoral Sentado'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'isolation',
-                        defaultWeight: 40,
-                        defaultReps: 12,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd1_ex6',
-                        variants: ['Tríceps en Polea con Soga', 'Tríceps Barra Recta'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 22.5,
-                        defaultReps: 12,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
+                    cardio: {
+                        id: 'cardio',
+                        shortName: '🏃 Deporte / Cardio',
+                        title: 'Sesión de Deporte o Cardio',
+                        subtitle: 'Ajusta automáticamente tu meta calórica del día',
+                        isCardio: true
                     }
-                ]
+                }
             },
-            day2: {
-                id: 'day2',
-                shortName: 'Día 2: Tracción/Isquios',
-                title: 'Día 2: Énfasis Tracción + Bisagra Cadera',
-                subtitle: 'Controlá la bajada en el Peso Muerto Rumano • RIR 1-2',
-                exercises: [
-                    {
-                        id: 'd2_ex1',
-                        variants: ['Peso Muerto Rumano Barra', 'Peso Muerto Rumano Mancuernas'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 75,
-                        defaultReps: 8,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+
+            fat_loss: {
+                id: 'fat_loss',
+                name: 'Reducción de Peso / Quema Grasa',
+                badge: 'Déficit / Metabólico',
+                goal: 'fatloss',
+                description: '3 días Full Body metabólico (descansos cortos) + Cardio Zona 2 / HIIT para perder grasa preservando músculo.',
+                recommendedProfile: { goal: 'fatloss', kcalTarget: 2100, proteinTarget: 150, cardioBonusKcal: 150 },
+                hasWeekModes: false,
+                routine: {
+                    day1: {
+                        id: 'day1',
+                        shortName: 'Día A: Full Body Fuerza',
+                        title: 'Full Body A: Circuito de Fuerza',
+                        subtitle: 'Descansos controlados (90s) • Mantené la intensidad para proteger músculo',
+                        exercises: [
+                            { id: 'fl1_1', variants: ['Sentadilla Goblet / Libre', 'Prensa de Piernas 45°'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 50, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'fl1_2', variants: ['Press Banca Mancuernas', 'Flexiones de Brazos', 'Press Máquina Pecho'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 20, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl1_3', variants: ['Remo en Polea Baja', 'Remo con Mancuerna a 1 Brazo'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 45, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl1_4', variants: ['Zancadas Caminando', 'Sentadilla Búlgara'], selectedVariant: 0, targetReps: '12 reps/pierna', type: 'isolation', defaultWeight: 12, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl1_5', variants: ['Plancha Abdominal (seg)', 'Crunch en Polea Alta'], selectedVariant: 0, targetReps: '45-60 seg', type: 'isolation', defaultWeight: 0, defaultReps: 45, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd2_ex2',
-                        variants: ['Jalón al Pecho Prono', 'Dominadas Libres / Lastradas'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 60,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day2: {
+                        id: 'day2',
+                        shortName: 'Día B: Metabólico',
+                        title: 'Full Body B: Énfasis Metabólico',
+                        subtitle: 'Alto gasto calórico • Ritmo ágil con buena técnica',
+                        exercises: [
+                            { id: 'fl2_1', variants: ['Peso Muerto Rumano Mancuernas', 'Kettlebell Swing'], selectedVariant: 0, targetReps: '12-15 reps', type: 'compound', defaultWeight: 20, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl2_2', variants: ['Jalón al Pecho Prono', 'Remo Invertido TRX'], selectedVariant: 0, targetReps: '12-15 reps', type: 'compound', defaultWeight: 45, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl2_3', variants: ['Press Militar Mancuernas', 'Press Arnold'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 14, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'fl2_4', variants: ['Hip Thrust Máquina / Barra', 'Puente de Glúteo'], selectedVariant: 0, targetReps: '12-15 reps', type: 'compound', defaultWeight: 60, defaultReps: 15, sets: makeSets(3, 0) },
+                            { id: 'fl2_5', variants: ['Superserie: Bíceps + Tríceps Polea', 'Thrusters con Mancuernas'], selectedVariant: 0, targetReps: '15 reps', type: 'isolation', defaultWeight: 15, defaultReps: 15, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd2_ex3',
-                        variants: ['Press Inclinado Mancuernas 30°', 'Press Inclinado Multipower'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 22.5,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day3: {
+                        id: 'day3',
+                        shortName: 'Día C: Resistencia',
+                        title: 'Full Body C: Tono y Resistencia',
+                        subtitle: 'Rango 12-15 reps • Ideal antes de 20 min de caminata inclinada',
+                        exercises: [
+                            { id: 'fl3_1', variants: ['Prensa 45° Pies Altos', 'Sentadilla Multipower'], selectedVariant: 0, targetReps: '12-15 reps', type: 'compound', defaultWeight: 100, defaultReps: 15, sets: makeSets(3, 1) },
+                            { id: 'fl3_2', variants: ['Press Inclinado Mancuernas', 'Aperturas Pec Deck'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 16, defaultReps: 14, sets: makeSets(3, 1) },
+                            { id: 'fl3_3', variants: ['Remo en Máquina', 'Face Pull en Polea Alta'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 40, defaultReps: 15, sets: makeSets(3, 0) },
+                            { id: 'fl3_4', variants: ['Elevaciones Laterales', 'Pájaros Mancuernas'], selectedVariant: 0, targetReps: '15 reps', type: 'isolation', defaultWeight: 8, defaultReps: 15, sets: makeSets(3, 0) },
+                            { id: 'fl3_5', variants: ['Elevaciones de Piernas Colgado', 'Bicicleta Abdominal'], selectedVariant: 0, targetReps: '15-20 reps', type: 'isolation', defaultWeight: 0, defaultReps: 15, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd2_ex4',
-                        variants: ['Sillón de Cuádriceps (Extensiones)'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 50,
-                        defaultReps: 14,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd2_ex5',
-                        variants: ['Elevaciones Laterales Mancuernas', 'Elevaciones Laterales Polea'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 10,
-                        defaultReps: 14,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd2_ex6',
-                        variants: ['Curl Bíceps Barra Z', 'Curl Mancuernas Banco Inclinado'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'isolation',
-                        defaultWeight: 27.5,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
+                    cardio: {
+                        id: 'cardio',
+                        shortName: '🔥 Cardio HIIT / Zona 2',
+                        title: 'Sesión de Cardio Quema Grasa',
+                        subtitle: 'Caminata inclinada 12-3-30, bici, running o intervalos HIIT',
+                        isCardio: true
                     }
-                ]
+                }
             },
-            day3: {
-                id: 'day3',
-                shortName: 'Día 3: Full Body',
-                title: 'Día 3: Full Body Híbrido',
-                subtitle: 'Ideal para los viernes post-partido de básquet del jueves',
-                exercises: [
-                    {
-                        id: 'd3_ex1',
-                        variants: ['Prensa de Piernas 45°', 'Sentadilla Búlgara Mancuernas'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 130,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+
+            ppl_standard: {
+                id: 'ppl_standard',
+                name: 'Push / Pull / Legs (Estándar)',
+                badge: 'Clásico 3-6 días',
+                goal: 'hypertrophy',
+                description: 'La división más popular del mundo: Empuje (pecho/hombro/tríceps), Tirón (espalda/bíceps) y Pierna.',
+                recommendedProfile: { goal: 'hypertrophy', kcalTarget: 2700, proteinTarget: 150, cardioBonusKcal: 200 },
+                hasWeekModes: false,
+                routine: {
+                    day1: {
+                        id: 'day1',
+                        shortName: 'Push (Empuje)',
+                        title: 'Push: Pecho + Hombros + Tríceps',
+                        subtitle: 'Controlá la excéntrica • 150s en presses, 90s en aislados',
+                        exercises: [
+                            { id: 'ppl1_1', variants: ['Press Banca Plano Barra', 'Press Plano Mancuernas'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 60, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ppl1_2', variants: ['Press Inclinado Mancuernas 30°', 'Press Inclinado Máquina'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 22, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ppl1_3', variants: ['Cruces en Polea Alta', 'Aperturas en Pec Deck'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 18, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'ppl1_4', variants: ['Press Militar Mancuernas', 'Press Hombros Máquina'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 16, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ppl1_5', variants: ['Elevaciones Laterales Mancuernas', 'Elevaciones Laterales Polea'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 10, defaultReps: 15, sets: makeSets(4, 0) },
+                            { id: 'ppl1_6', variants: ['Tríceps en Polea con Soga', 'Press Francés Barra Z'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 22.5, defaultReps: 12, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd3_ex2',
-                        variants: ['Fondos en Paralelas', 'Press Máquina Convergente'],
-                        selectedVariant: 0,
-                        targetReps: '8-10 reps',
-                        type: 'compound',
-                        defaultWeight: 75,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day2: {
+                        id: 'day2',
+                        shortName: 'Pull (Tirón)',
+                        title: 'Pull: Espalda + Deltoides Post. + Bíceps',
+                        subtitle: 'Retracción escapular en cada repetición',
+                        exercises: [
+                            { id: 'ppl2_1', variants: ['Dominadas Libres / Lastradas', 'Jalón al Pecho Prono'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 55, defaultReps: 10, sets: makeSets(4, 1) },
+                            { id: 'ppl2_2', variants: ['Remo con Barra', 'Remo en Punta (T-Bar)', 'Remo Polea Baja'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 55, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ppl2_3', variants: ['Jalón Agarre Estrecho Neutro', 'Pull-Over en Polea Alta'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 45, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'ppl2_4', variants: ['Face Pull en Polea Alta', 'Pájaros en Máquina'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 22.5, defaultReps: 15, sets: makeSets(3, 0) },
+                            { id: 'ppl2_5', variants: ['Curl Bíceps Barra Z', 'Curl Alterno Mancuernas'], selectedVariant: 0, targetReps: '8-12 reps', type: 'isolation', defaultWeight: 25, defaultReps: 10, sets: makeSets(3, 0) },
+                            { id: 'ppl2_6', variants: ['Curl Martillo Mancuernas', 'Curl Bíceps Banco Scott'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 14, defaultReps: 12, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd3_ex3',
-                        variants: ['Remo a 1 Brazo con Mancuerna', 'Remo en Punta (T-Bar)'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'compound',
-                        defaultWeight: 26,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day3: {
+                        id: 'day3',
+                        shortName: 'Legs (Pierna)',
+                        title: 'Legs: Cuádriceps + Isquios + Glúteo + Gemelo',
+                        subtitle: 'Rango completo de movimiento y pausas controladas',
+                        exercises: [
+                            { id: 'ppl3_1', variants: ['Sentadilla Libre', 'Hack Squat', 'Prensa 45°'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 70, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ppl3_2', variants: ['Peso Muerto Rumano Barra', 'Peso Muerto Rumano Mancuernas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 70, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ppl3_3', variants: ['Prensa de Piernas 45°', 'Sentadilla Búlgara Mancuernas'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 120, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ppl3_4', variants: ['Sillón de Cuádriceps (Extensiones)'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 50, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'ppl3_5', variants: ['Curl Femoral Tumbado', 'Curl Femoral Sentado'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 40, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'ppl3_6', variants: ['Gemelos de Pie en Máquina', 'Gemelos Sentado'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 60, defaultReps: 15, sets: makeSets(4, 0) }
                         ]
                     },
-                    {
-                        id: 'd3_ex4',
-                        variants: ['Hip Thrust con Barra', 'Curl Femoral Sentado'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'compound',
-                        defaultWeight: 85,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd3_ex5',
-                        variants: ['Face Pull en Polea Alta', 'Pájaros en Máquina (Deltoides Post.)'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 25,
-                        defaultReps: 15,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd3_ex6',
-                        variants: ['Superserie: Martillo + Ext. Tras Nuca', 'Superserie: Martillo + Press Francés'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'isolation',
-                        defaultWeight: 14,
-                        defaultReps: 12,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd3_ex7',
-                        variants: ['Gemelos de Pie en Máquina', 'Gemelos Sentado'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 60,
-                        defaultReps: 15,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
+                    cardio: {
+                        id: 'cardio',
+                        shortName: '🏃 Cardio / Deporte',
+                        title: 'Sesión de Cardio o Deporte',
+                        subtitle: 'Complemento aeróbico opcional',
+                        isCardio: true
                     }
-                ]
+                }
             },
-            day4: {
-                id: 'day4',
-                shortName: 'Día 4: Torso/Brazos',
-                title: 'Día 4 (Opcional): Torso + Brazos + Estética',
-                subtitle: 'Sin fatiga de piernas • No interfiere con el básquet',
-                exercises: [
-                    {
-                        id: 'd4_ex1',
-                        variants: ['Cruces en Polea Alta', 'Aperturas en Pec Deck'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 20,
-                        defaultReps: 14,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
+
+            upper_lower: {
+                id: 'upper_lower',
+                name: 'Torso / Pierna (4 días Estándar)',
+                badge: 'Equilibrado',
+                goal: 'recomp',
+                description: 'Frecuencia 2 por grupo muscular: 2 días de Torso y 2 días de Pierna. Ideal para fuerza y estética.',
+                recommendedProfile: { goal: 'recomp', kcalTarget: 2500, proteinTarget: 150, cardioBonusKcal: 200 },
+                hasWeekModes: false,
+                routine: {
+                    day1: {
+                        id: 'day1',
+                        shortName: 'Torso A (Fuerza)',
+                        title: 'Torso A: Enfoque Fuerza',
+                        subtitle: 'Cargas moderadas-altas • 6-10 repeticiones en compuestos',
+                        exercises: [
+                            { id: 'ul1_1', variants: ['Press Banca Plano Barra', 'Press Plano Mancuernas'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 60, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ul1_2', variants: ['Remo con Barra', 'Remo Polea Baja Neutro'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 55, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ul1_3', variants: ['Press Militar Mancuernas', 'Press Militar Barra'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 18, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul1_4', variants: ['Jalón al Pecho Prono', 'Dominadas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 55, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul1_5', variants: ['Curl Bíceps Barra Z', 'Tríceps en Polea con Soga'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 25, defaultReps: 12, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd4_ex2',
-                        variants: ['Jalón Agarre Estrecho Neutro', 'Jalón Supino'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'compound',
-                        defaultWeight: 55,
-                        defaultReps: 10,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false }
+                    day2: {
+                        id: 'day2',
+                        shortName: 'Pierna A (Cuád)',
+                        title: 'Pierna A: Énfasis Cuádriceps',
+                        subtitle: 'Profundidad y control en sentadilla',
+                        exercises: [
+                            { id: 'ul2_1', variants: ['Sentadilla Libre', 'Hack Squat'], selectedVariant: 0, targetReps: '6-8 reps', type: 'compound', defaultWeight: 70, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ul2_2', variants: ['Prensa de Piernas 45°', 'Zancadas Mancuernas'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 120, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul2_3', variants: ['Curl Femoral Sentado', 'Curl Femoral Tumbado'], selectedVariant: 0, targetReps: '10-12 reps', type: 'isolation', defaultWeight: 40, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'ul2_4', variants: ['Sillón de Cuádriceps (Extensiones)'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 50, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'ul2_5', variants: ['Gemelos de Pie en Máquina', 'Crunch Abdominal en Polea'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 55, defaultReps: 15, sets: makeSets(4, 0) }
                         ]
                     },
-                    {
-                        id: 'd4_ex3',
-                        variants: ['Elevaciones Laterales en Polea', 'Elevaciones Laterales Mancuernas'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 7.5,
-                        defaultReps: 15,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
+                    day3: {
+                        id: 'day3',
+                        shortName: 'Torso B (Hipert.)',
+                        title: 'Torso B: Enfoque Hipertrofia',
+                        subtitle: 'Rango 10-15 reps • Máxima conexión mente-músculo',
+                        exercises: [
+                            { id: 'ul3_1', variants: ['Press Inclinado Mancuernas 30°', 'Press Máquina Convergente'], selectedVariant: 0, targetReps: '8-12 reps', type: 'compound', defaultWeight: 22, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul3_2', variants: ['Remo a 1 Brazo con Mancuerna', 'Jalón Agarre Estrecho'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 24, defaultReps: 12, sets: makeSets(3, 1) },
+                            { id: 'ul3_3', variants: ['Cruces en Polea Alta', 'Aperturas Pec Deck'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 18, defaultReps: 14, sets: makeSets(3, 0) },
+                            { id: 'ul3_4', variants: ['Elevaciones Laterales Mancuernas', 'Elevaciones Laterales Polea'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 10, defaultReps: 15, sets: makeSets(4, 0) },
+                            { id: 'ul3_5', variants: ['Superserie: Martillo + Tríceps Polea', 'Face Pull en Polea Alta'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 14, defaultReps: 12, sets: makeSets(3, 0) }
                         ]
                     },
-                    {
-                        id: 'd4_ex4',
-                        variants: ['Curl Bíceps Banco Scott', 'Spider Curl con Mancuernas'],
-                        selectedVariant: 0,
-                        targetReps: '10-12 reps',
-                        type: 'isolation',
-                        defaultWeight: 25,
-                        defaultReps: 12,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
+                    day4: {
+                        id: 'day4',
+                        shortName: 'Pierna B (Posterior)',
+                        title: 'Pierna B: Énfasis Isquios y Glúteo',
+                        subtitle: 'Bisagra de cadera controlada',
+                        exercises: [
+                            { id: 'ul4_1', variants: ['Peso Muerto Rumano Barra', 'Peso Muerto Rumano Mancuernas'], selectedVariant: 0, targetReps: '8-10 reps', type: 'compound', defaultWeight: 70, defaultReps: 8, sets: makeSets(4, 1) },
+                            { id: 'ul4_2', variants: ['Hip Thrust con Barra', 'Hip Thrust Máquina'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 80, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul4_3', variants: ['Sentadilla Búlgara Mancuernas', 'Prensa Pies Altos'], selectedVariant: 0, targetReps: '10-12 reps', type: 'compound', defaultWeight: 16, defaultReps: 10, sets: makeSets(3, 1) },
+                            { id: 'ul4_4', variants: ['Curl Femoral Tumbado', 'Curl Femoral Sentado'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 38, defaultReps: 12, sets: makeSets(3, 0) },
+                            { id: 'ul4_5', variants: ['Gemelos Sentado', 'Elevaciones de Piernas Colgado'], selectedVariant: 0, targetReps: '12-15 reps', type: 'isolation', defaultWeight: 45, defaultReps: 15, sets: makeSets(4, 0) }
                         ]
                     },
-                    {
-                        id: 'd4_ex5',
-                        variants: ['Tríceps Unilateral en Polea', 'Fondos entre Bancos'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 10,
-                        defaultReps: 14,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
-                    },
-                    {
-                        id: 'd4_ex6',
-                        variants: ['Crunch Abdominal en Polea Alta', 'Elevaciones de Piernas Colgado'],
-                        selectedVariant: 0,
-                        targetReps: '12-15 reps',
-                        type: 'isolation',
-                        defaultWeight: 35,
-                        defaultReps: 15,
-                        sets: [
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 1, done: false },
-                            { weight: '', reps: '', rir: 0, done: false }
-                        ]
+                    cardio: {
+                        id: 'cardio',
+                        shortName: '🏃 Cardio / Deporte',
+                        title: 'Sesión de Cardio o Deporte',
+                        subtitle: 'Cardio LISS, HIIT o deporte recreativo',
+                        isCardio: true
                     }
-                ]
-            },
-            basket: {
-                id: 'basket',
-                shortName: '🏀 Partido Básquet',
-                title: 'Partido / Entreno de Básquet',
-                subtitle: 'Sube automáticamente tu meta de hoy a 3.400 kcal',
-                isBasket: true
+                }
             }
         };
 
-        const QUICK_MEAL_IDEAS = [
-            "⚡ Opción Batido Denso (420 kcal | 24g prot): 1/2 scoop extra de Proteína de Soja HSN (25g) + 1 cda sopera colmada de crema de cacahuete + 1 banana + agua o bebida vegetal.",
-            "🥜 Opción Crunch Sin Cocinar (450 kcal | 18g prot): 1 puñado grande de pistachos o nueces (50g) + 1 yogur alto en proteínas o vaso de bebida de soja + 40g de avena.",
-            "🍞 Opción Tostada Rápida (410 kcal | 20g prot): 2 rebanadas de pan integral + 2 cdas generosas de crema de cacahuete (maní) + semillas de chía por encima.",
-            "🫒 Opción Salada Express (390 kcal | 22g prot): 1 lata de atún o bloque de tofu firme desmenuzado + 1 chorro generoso de aceite de oliva virgen extra + 4 tostadas de arroz."
-        ];
+        const QUICK_MEAL_IDEAS_BY_GOAL = {
+            hypertrophy: [
+                "⚡ Batido Hipercalórico (420 kcal | 28g prot): 1 scoop de proteína + 1 cda sopera de crema de cacahuete + 1 banana + leche o bebida vegetal.",
+                "🥜 Snack Denso Sin Cocinar (450 kcal | 18g prot): 1 puñado grande de frutos secos (50g) + 1 yogur proteico + 40g de avena.",
+                "🍞 Tostada Energética (410 kcal | 20g prot): 2 rebanadas de pan integral + 2 cdas generosas de mantequilla de maní + semillas de chía.",
+                "🫒 Opción Salada Express (390 kcal | 25g prot): 1 lata de atún o pollo desmenuzado + aceite de oliva virgen extra + 4 tostadas de arroz."
+            ],
+            fatloss: [
+                "🥗 Snack Saciante Bajo en Kcal (190 kcal | 24g prot): 1 yogur griego 0% o Skyr + frutos rojos + 1/2 scoop de proteína o canela.",
+                "🥚 Proteína Express (210 kcal | 22g prot): 2 huevos duros + 100g de claras revueltas o pechuga de pavo con vegetales.",
+                "🐟 Ensalada Rápida (240 kcal | 26g prot): 1 lata de atún al natural + pepino, tomate y limón + 2 tortitas de arroz.",
+                "🍓 Batido Ligero Post-Entreno (160 kcal | 25g prot): 1 scoop de proteína en agua fría + 1 manzana o fresas."
+            ],
+            recomp: [
+                "⚡ Post-Entreno Equilibrado (300 kcal | 28g prot): 1 scoop de proteína + 1 fruta mediana + un puñadito de almendras.",
+                "🥪 Tostada Proteica (320 kcal | 24g prot): Pan integral + queso fresco batido o aguacate + huevo/pavo.",
+                "🥣 Bowl Rápido (340 kcal | 26g prot): Yogur alto en proteínas + 30g de avena + frutas picadas.",
+                "🌯 Wrap Ligero (350 kcal | 28g prot): Tortilla integral + pollo/tofu + hojas verdes y salsa de yogur."
+            ]
+        };
 
         function getTodayDateKey() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function cloneProgramRoutine(programId) {
+            const prog = TRAINING_PROGRAMS[programId] || TRAINING_PROGRAMS.hypertrophy_sport;
+            return JSON.parse(JSON.stringify(prog.routine));
         }
 
         // ----------------------------------------------------
@@ -1099,9 +1111,18 @@
         // ----------------------------------------------------
         let appState = {
             currentTab: 'entrenar',
+            activeProgramId: 'hypertrophy_sport',
             selectedDayId: 'day1',
             weekMode: 'standard',
-            routine: JSON.parse(JSON.stringify(INITIAL_ROUTINE)),
+            profile: {
+                goal: 'hypertrophy', // 'hypertrophy' | 'fatloss' | 'recomp'
+                heightM: 1.80,
+                targetWeightKg: 78.0,
+                kcalTarget: 3000,
+                proteinTarget: 155,
+                cardioBonusKcal: 250
+            },
+            routine: cloneProgramRoutine('hypertrophy_sport'),
             ghostHistory: {},
             workoutLogs: [],
             weightHistory: [{ date: 'Inicio', weight: 75.0 }],
@@ -1114,14 +1135,17 @@
                 meal4: false,
                 isBasketDay: false
             },
-            basketSessionIntensity: 'Partido Oficial / Intenso',
-            basketDuration: 60,
+            cardioActivity: 'Básquet / Deporte en equipo',
+            cardioIntensity: 'Intenso (Alta exigencia)',
+            cardioDuration: 45,
             ideaIndex: 0
         };
 
         function serializePersistableState() {
             return {
+                activeProgramId: appState.activeProgramId,
                 weekMode: appState.weekMode,
+                profile: appState.profile,
                 ghostHistory: appState.ghostHistory,
                 workoutLogs: appState.workoutLogs,
                 weightHistory: appState.weightHistory,
@@ -1133,7 +1157,7 @@
 
         function loadLocalState() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
                 if (!raw) return;
                 const parsed = JSON.parse(raw);
                 mergeLoadedState(parsed);
@@ -1144,11 +1168,16 @@
 
         function mergeLoadedState(loaded) {
             if (!loaded || typeof loaded !== 'object') return;
-            // Si viene envuelto en { serializedState: "..." } (formato directo de Firestore)
             if (typeof loaded.serializedState === 'string') {
                 loaded = JSON.parse(loaded.serializedState);
             }
+            if (loaded.activeProgramId && TRAINING_PROGRAMS[loaded.activeProgramId]) {
+                appState.activeProgramId = loaded.activeProgramId;
+            }
             if (loaded.weekMode) appState.weekMode = loaded.weekMode;
+            if (loaded.profile && typeof loaded.profile === 'object') {
+                appState.profile = Object.assign({}, appState.profile, loaded.profile);
+            }
             if (loaded.ghostHistory && typeof loaded.ghostHistory === 'object') {
                 appState.ghostHistory = loaded.ghostHistory;
             }
@@ -1161,8 +1190,22 @@
             if (loaded.dailyNutrition && loaded.dailyNutrition.dateKey === getTodayDateKey()) {
                 appState.dailyNutrition = loaded.dailyNutrition;
             }
-            if (loaded.routine && loaded.routine.day1) {
+            if (loaded.routine && typeof loaded.routine === 'object' && Object.keys(loaded.routine).length > 0) {
+                // Compatibilidad con backups viejos que tenían key 'basket' en vez de 'cardio'
+                if (loaded.routine.basket && !loaded.routine.cardio) {
+                    loaded.routine.cardio = {
+                        id: 'cardio',
+                        shortName: '🏃 Deporte / Cardio',
+                        title: 'Sesión de Deporte o Cardio',
+                        subtitle: 'Ajusta automáticamente tu meta calórica del día',
+                        isCardio: true
+                    };
+                    delete loaded.routine.basket;
+                }
                 appState.routine = loaded.routine;
+            }
+            if (!appState.routine[appState.selectedDayId]) {
+                appState.selectedDayId = Object.keys(appState.routine)[0] || 'day1';
             }
         }
 
@@ -1193,7 +1236,7 @@
         let driveFolderId = null;
 
         function getSavedClientId() {
-            return (localStorage.getItem(CLIENT_ID_STORAGE_KEY) || DEFAULT_GOOGLE_CLIENT_ID || '').trim();
+            return (localStorage.getItem(CLIENT_ID_STORAGE_KEY) || localStorage.getItem('hyperhoops_google_client_id') || DEFAULT_GOOGLE_CLIENT_ID || '').trim();
         }
 
         function setSyncBadge(state, text) {
@@ -1292,7 +1335,6 @@
                     updateDriveModalUI();
                     showToast('Google Drive conectado');
 
-                    // Intentar traer datos existentes de Drive si hay pocos datos locales, o sincronizar
                     await loadFromGoogleDrive(false);
                     await syncToGoogleDrive(false);
                 }
@@ -1348,7 +1390,7 @@
 
         async function upsertDriveFile(fileName, content, mimeType, folderId) {
             const existing = await findDriveFile(fileName, folderId);
-            const boundary = 'hyperhoops_boundary_' + Date.now();
+            const boundary = 'hypergym_boundary_' + Date.now();
             const metadata = existing
                 ? { name: fileName, mimeType }
                 : { name: fileName, mimeType, parents: [folderId] };
@@ -1489,7 +1531,7 @@
 
         function downloadBackupJSON() {
             const json = JSON.stringify(serializePersistableState(), null, 2);
-            downloadFile(`hyperhoops_backup_${getTodayDateKey()}.json`, json, 'application/json');
+            downloadFile(`hypergym_backup_${getTodayDateKey()}.json`, json, 'application/json');
             showToast('Backup JSON descargado');
         }
 
@@ -1501,14 +1543,12 @@
             return Math.round(w * (1 + r / 30) * 10) / 10;
         }
 
-        // Extrae datos estructurados de ejercicios tanto de logs nuevos como importados de Gemini
         function extractExerciseMetricsFromLog(log) {
             if (Array.isArray(log.exercises) && log.exercises.length > 0) {
                 return log.exercises;
             }
             const parsed = [];
             (log.details || []).forEach(line => {
-                // Formato original: "Sentadilla Libre: 3x (70kg × 8)"
                 const m = String(line).match(/^(.+?):\s*(\d+)x\s*\(([\d.]+)\s*kg\s*[×x]\s*(\d+)\)/i);
                 if (m) {
                     const name = m[1].trim();
@@ -1529,30 +1569,29 @@
         }
 
         function buildMetricsCSV() {
-            const header = ['Fecha', 'Dia', 'Ejercicio', 'Series', 'Peso_Max_kg', 'Reps_Mejor_Serie', 'Volumen_Ejercicio_kg', '1RM_Estimado_kg', 'Volumen_Sesion_kg'];
+            const header = ['Fecha', 'Programa', 'Dia', 'Ejercicio', 'Series', 'Peso_Max_kg', 'Reps_Mejor_Serie', 'Volumen_Ejercicio_kg', '1RM_Estimado_kg', 'Volumen_Sesion_kg'];
             const rows = [header.join(',')];
             const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
-            // Orden cronológico (más antiguo primero) para graficar directo en Google Sheets
             const chronological = [...appState.workoutLogs].reverse();
             chronological.forEach(log => {
+                const progName = log.programName || TRAINING_PROGRAMS[appState.activeProgramId]?.name || 'HyperGym';
                 const exList = extractExerciseMetricsFromLog(log);
                 if (exList.length === 0) {
                     rows.push([
                         esc(log.date),
+                        esc(progName),
                         esc(log.title),
                         esc(log.title),
                         esc(log.setsCount || ''),
-                        0,
-                        0,
-                        0,
-                        0,
+                        0, 0, 0, 0,
                         log.volume || 0
                     ].join(','));
                 } else {
                     exList.forEach(ex => {
                         rows.push([
                             esc(log.date),
+                            esc(progName),
                             esc(log.title),
                             esc(ex.name),
                             ex.setsCount || (ex.sets ? ex.sets.length : 0),
@@ -1570,8 +1609,63 @@
 
         function downloadMetricsCSV() {
             const csv = buildMetricsCSV();
-            downloadFile(`hyperhoops_metricas_${getTodayDateKey()}.csv`, csv, 'text/csv;charset=utf-8;');
+            downloadFile(`hypergym_metricas_${getTodayDateKey()}.csv`, csv, 'text/csv;charset=utf-8;');
             showToast('CSV de métricas descargado');
+        }
+
+        // ----------------------------------------------------
+        // 2D. PERFIL DEL USUARIO Y OBJETIVOS
+        // ----------------------------------------------------
+        function openProfileModal() {
+            const p = appState.profile;
+            document.getElementById('prof-goal').value = p.goal || 'hypertrophy';
+            document.getElementById('prof-height').value = p.heightM || 1.80;
+            document.getElementById('prof-target-weight').value = p.targetWeightKg || 78.0;
+            document.getElementById('prof-kcal').value = p.kcalTarget || 2600;
+            document.getElementById('prof-prot').value = p.proteinTarget || 150;
+            document.getElementById('prof-cardio-bonus').value = p.cardioBonusKcal ?? 200;
+
+            const m = document.getElementById('modal-profile');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeProfileModal() {
+            const m = document.getElementById('modal-profile');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function applyGoalPresetToInputs() {
+            const g = document.getElementById('prof-goal').value;
+            if (g === 'hypertrophy') {
+                document.getElementById('prof-kcal').value = 3000;
+                document.getElementById('prof-prot').value = 155;
+                document.getElementById('prof-cardio-bonus').value = 250;
+            } else if (g === 'fatloss') {
+                document.getElementById('prof-kcal').value = 2100;
+                document.getElementById('prof-prot').value = 150;
+                document.getElementById('prof-cardio-bonus').value = 150;
+            } else {
+                document.getElementById('prof-kcal').value = 2500;
+                document.getElementById('prof-prot').value = 150;
+                document.getElementById('prof-cardio-bonus').value = 200;
+            }
+        }
+
+        function saveProfileSettings() {
+            appState.profile = {
+                goal: document.getElementById('prof-goal').value,
+                heightM: parseFloat(document.getElementById('prof-height').value) || 1.80,
+                targetWeightKg: parseFloat(document.getElementById('prof-target-weight').value) || 75.0,
+                kcalTarget: parseInt(document.getElementById('prof-kcal').value) || 2600,
+                proteinTarget: parseInt(document.getElementById('prof-prot').value) || 150,
+                cardioBonusKcal: parseInt(document.getElementById('prof-cardio-bonus').value) || 0
+            };
+            closeProfileModal();
+            renderAll();
+            saveAppState(true);
+            showToast('Perfil y metas actualizados');
         }
 
         // ----------------------------------------------------
@@ -1579,7 +1673,7 @@
         // ----------------------------------------------------
         function renderDaySelector() {
             const container = document.getElementById('day-selector-container');
-            const days = ['day1', 'day2', 'day3', 'day4', 'basket'];
+            const days = Object.keys(appState.routine);
             container.innerHTML = days.map(dKey => {
                 const dObj = appState.routine[dKey];
                 const isSelected = appState.selectedDayId === dKey;
@@ -1607,7 +1701,9 @@
         }
 
         function renderExercisesList() {
-            const dayObj = appState.routine[appState.selectedDayId];
+            const dayObj = appState.routine[appState.selectedDayId] || appState.routine[Object.keys(appState.routine)[0]];
+            if (!dayObj) return;
+
             document.getElementById('day-title').textContent = dayObj.title;
             document.getElementById('day-subtitle').textContent = dayObj.subtitle;
 
@@ -1615,36 +1711,48 @@
             const addWrapper = document.getElementById('add-exercise-wrapper');
             const finishBtnText = document.getElementById('finish-btn-text');
 
-            if (dayObj.isBasket) {
+            if (dayObj.isCardio || dayObj.isBasket) {
                 addWrapper.classList.add('hidden');
-                finishBtnText.textContent = 'REGISTRAR PARTIDO DE BÁSQUET (+3400 KCAL)';
-                document.getElementById('current-session-volume').textContent = 'Cardio Alta Int.';
+                const bonus = appState.profile.cardioBonusKcal || 200;
+                const newTarget = (appState.profile.kcalTarget || 2600) + bonus;
+                finishBtnText.textContent = `REGISTRAR SESIÓN DE CARDIO / DEPORTE (+${bonus} KCAL)`;
+                document.getElementById('current-session-volume').textContent = 'Cardio / Deporte';
                 listContainer.innerHTML = `
                     <div class="bg-slate-800/80 border border-amber-500/40 rounded-2xl p-5 space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center">
-                                <i class="ph-fill ph-basketball text-3xl"></i>
+                                <i class="ph-fill ph-sneaker-move text-3xl"></i>
                             </div>
                             <div>
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Gasto Calórico Elevado</span>
-                                <h3 class="text-base font-extrabold text-white">Sesión de Básquet</h3>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Actividad Aeróbica / Deportiva</span>
+                                <h3 class="text-base font-extrabold text-white">Registrar Cardio o Deporte</h3>
                             </div>
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Para no perder masa muscular jugando al básquet con tus 1.85m, hoy tu meta calórica sube automáticamente a <strong>3.400 kcal</strong> y te conviene tomar tu batido de <strong>Soja HSN + 60g Evocarbs</strong> apenas termines el partido.
+                            Al registrar esta sesión, tu meta calórica de hoy se ajustará automáticamente a <strong>${newTarget.toLocaleString('es-ES')} kcal</strong> (+${bonus} kcal) para apoyar tu rendimiento y recuperación.
                         </p>
-                        <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div class="space-y-3 pt-1">
                             <div>
-                                <label class="text-[11px] text-slate-400 font-semibold block mb-1">Duración (min)</label>
-                                <input type="number" value="${appState.basketDuration}" onchange="updateBasketDuration(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 font-mono text-sm font-bold text-white">
-                            </div>
-                            <div>
-                                <label class="text-[11px] text-slate-400 font-semibold block mb-1">Exigencia</label>
-                                <select onchange="updateBasketIntensity(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-white">
-                                    <option value="Partido Oficial / Intenso">Partido Intenso</option>
-                                    <option value="Pachanga / Amigos">Partido Amigos</option>
-                                    <option value="Entrenamiento Técnico">Tiro / Técnico</option>
+                                <label class="text-[11px] text-slate-400 font-semibold block mb-1">Actividad</label>
+                                <select onchange="updateCardioActivity(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white">
+                                    ${['Básquet / Deporte en equipo', 'Caminata Inclinada / Zona 2', 'Running / Trote', 'Cardio HIIT / Intervalos', 'Bicicleta / Spinning', 'Natación / Remo'].map(act =>
+                                        `<option value="${act}" ${appState.cardioActivity === act ? 'selected' : ''}>${act}</option>`
+                                    ).join('')}
                                 </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[11px] text-slate-400 font-semibold block mb-1">Duración (min)</label>
+                                    <input type="number" value="${appState.cardioDuration}" onchange="updateCardioDuration(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 font-mono text-sm font-bold text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-400 font-semibold block mb-1">Intensidad</label>
+                                    <select onchange="updateCardioIntensity(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-white">
+                                        ${['Intenso (Alta exigencia)', 'Moderado (Ritmo constante)', 'Suave (Recuperación)'].map(int =>
+                                            `<option value="${int}" ${appState.cardioIntensity === int ? 'selected' : ''}>${int}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1676,7 +1784,7 @@
                     : '';
 
                 const ghostLabel = ghost.isInitialSuggestion
-                    ? `Sugerido (75kg): <strong class="text-slate-200 font-mono">${ghost.weight}kg × ${ghost.reps}</strong>`
+                    ? `Sugerido: <strong class="text-slate-200 font-mono">${ghost.weight}kg × ${ghost.reps}</strong>`
                     : `Última vez: <strong class="text-emerald-400 font-mono">${ghost.weight}kg × ${ghost.reps}</strong>`;
 
                 return `
@@ -1688,8 +1796,11 @@
                                 <span class="text-[10px] font-mono text-slate-400">${ex.type === 'compound' ? '⏱ 150s' : '⏱ 90s'}</span>
                                 ${overloadBadge}
                             </div>
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 flex-wrap">
                                 <h3 class="font-extrabold text-sm text-white leading-snug">${currentVariantName}</h3>
+                                <button onclick="openEditExerciseModal(${exIdx})" title="Editar nombre o detalles del ejercicio" class="p-1 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-emerald-300 flex items-center justify-center shrink-0 active:scale-95">
+                                    <i class="ph-bold ph-pencil-simple text-xs"></i>
+                                </button>
                                 ${ex.variants.length > 1 ? `
                                     <button onclick="cycleExerciseVariant(${exIdx})" title="Cambiar variante de máquina/ejercicio" class="px-2 py-0.5 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-[10px] font-semibold text-emerald-300 flex items-center gap-1 shrink-0 active:scale-95">
                                         <i class="ph-bold ph-arrows-left-right"></i> Variante
@@ -1967,25 +2078,28 @@
         // ----------------------------------------------------
         function finishWorkoutSession() {
             const dayObj = appState.routine[appState.selectedDayId];
+            const prog = TRAINING_PROGRAMS[appState.activeProgramId] || TRAINING_PROGRAMS.hypertrophy_sport;
             const now = new Date();
             const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-            if (dayObj.isBasket) {
+            if (dayObj.isCardio || dayObj.isBasket) {
                 appState.dailyNutrition.isBasketDay = true;
+                const bonus = appState.profile.cardioBonusKcal || 200;
                 appState.workoutLogs.unshift({
                     id: 'log_' + Date.now(),
                     isoDate: getTodayDateKey(),
                     date: dateStr,
-                    dayId: 'basket',
-                    title: '🏀 Partido de Básquet',
+                    dayId: 'cardio',
+                    programName: prog.name,
+                    title: `🏃 ${appState.cardioActivity}`,
                     volume: 0,
-                    setsCount: `${appState.basketDuration} min`,
-                    details: [`${appState.basketSessionIntensity} (${appState.basketDuration} min) • Meta ajustada a 3400 kcal`],
+                    setsCount: `${appState.cardioDuration} min`,
+                    details: [`${appState.cardioIntensity} (${appState.cardioDuration} min) • +${bonus} kcal ajustadas`],
                     exercises: []
                 });
                 saveAppState(true);
                 renderAll();
-                showToast('🏀 Básquet registrado • Meta subida a 3400 kcal');
+                showToast(`Cardio registrado • Meta ajustada +${bonus} kcal`);
                 switchTab('combustible');
                 return;
             }
@@ -2065,6 +2179,7 @@
                 isoDate: getTodayDateKey(),
                 date: dateStr,
                 dayId: dayObj.id,
+                programName: prog.name,
                 title: dayObj.shortName,
                 volume: Math.round(sessionVolume * 10) / 10,
                 setsCount: `${completedSetsCount} series`,
@@ -2094,56 +2209,60 @@
         // ----------------------------------------------------
         // 7. PESTAÑA "COMBUSTIBLE" (NUTRICIÓN Y PESO)
         // ----------------------------------------------------
-        const NUTRITION_ITEMS = [
-            {
-                key: 'meal1',
-                title: 'Comida Principal 1 (Desayuno / Almuerzo)',
-                subtitle: 'Huevos/Soja/Legumbres + Carbohidratos complejos',
-                prot: 38,
-                kcal: 750,
-                icon: 'ph-egg-crack'
-            },
-            {
-                key: 'meal2',
-                title: 'Comida Principal 2',
-                subtitle: 'Plato fuerte con proteína + arroz/pasta/patata + aceite oliva',
-                prot: 40,
-                kcal: 850,
-                icon: 'ph-bowl-food'
-            },
-            {
-                key: 'hsnShake',
-                title: 'Batido HSN: 45-50g Soja + 60g Evocarbs',
-                subtitle: 'Post-entreno o Post-básquet (~40g prot neta + 54g carbs rápidos)',
-                prot: 40,
-                kcal: 410,
-                icon: 'ph-lightning',
-                highlight: true
-            },
-            {
-                key: 'meal3',
-                title: 'Comida Principal 3 (Cena)',
-                subtitle: 'Fuente proteica completa + verduras + grasas saludables',
-                prot: 38,
-                kcal: 780,
-                icon: 'ph-moon-stars'
-            },
-            {
-                key: 'meal4',
-                title: '4.ª Comida / Extra Calórico Rápido',
-                subtitle: 'Crema de cacahuete, frutos secos, avena o 1/2 scoop extra',
-                prot: 20,
-                kcal: 430,
-                icon: 'ph-nut'
-            }
-        ];
+        function getNutritionItemsForGoal() {
+            const isCut = appState.profile.goal === 'fatloss';
+            return [
+                {
+                    key: 'meal1',
+                    title: 'Comida Principal 1 (Desayuno / Almuerzo)',
+                    subtitle: isCut ? 'Proteína magra + fruta o avena medida' : 'Huevos/Soja/Legumbres + Carbohidratos complejos',
+                    prot: 35,
+                    kcal: isCut ? 480 : 720,
+                    icon: 'ph-egg-crack'
+                },
+                {
+                    key: 'meal2',
+                    title: 'Comida Principal 2',
+                    subtitle: isCut ? 'Proteína + vegetales abundantes + porción moderada de carbos' : 'Plato fuerte con proteína + arroz/pasta/patata + aceite de oliva',
+                    prot: 40,
+                    kcal: isCut ? 580 : 820,
+                    icon: 'ph-bowl-food'
+                },
+                {
+                    key: 'hsnShake',
+                    title: 'Batido Proteico / Post-Entreno',
+                    subtitle: isCut ? '1-1.5 scoop de proteína con agua o fruta ligera' : 'Proteína en polvo + carbohidratos rápidos o fruta',
+                    prot: 35,
+                    kcal: isCut ? 220 : 380,
+                    icon: 'ph-lightning',
+                    highlight: true
+                },
+                {
+                    key: 'meal3',
+                    title: 'Comida Principal 3 (Cena)',
+                    subtitle: 'Fuente proteica completa + verduras + grasas saludables',
+                    prot: 38,
+                    kcal: isCut ? 520 : 740,
+                    icon: 'ph-moon-stars'
+                },
+                {
+                    key: 'meal4',
+                    title: isCut ? 'Snack Saciante / Extra Proteico' : '4.ª Comida / Extra Calórico Rápido',
+                    subtitle: isCut ? 'Yogur proteico, gelatina, fruta o claras' : 'Crema de cacahuete, frutos secos, avena o extra proteico',
+                    prot: 20,
+                    kcal: isCut ? 220 : 420,
+                    icon: 'ph-nut'
+                }
+            ];
+        }
 
         function renderNutritionTab() {
             const container = document.getElementById('nutrition-checks-list');
+            const items = getNutritionItemsForGoal();
             let totalProt = 0;
             let totalKcal = 0;
 
-            container.innerHTML = NUTRITION_ITEMS.map(item => {
+            container.innerHTML = items.map(item => {
                 const checked = !!appState.dailyNutrition[item.key];
                 if (checked) {
                     totalProt += item.prot;
@@ -2182,13 +2301,24 @@
                 `;
             }).join('');
 
-            const targetKcal = appState.dailyNutrition.isBasketDay ? 3400 : 3200;
+            const baseKcal = appState.profile.kcalTarget || 2600;
+            const bonusKcal = appState.profile.cardioBonusKcal || 200;
+            const targetKcal = appState.dailyNutrition.isBasketDay ? (baseKcal + bonusKcal) : baseKcal;
+            const targetProt = appState.profile.proteinTarget || 150;
+
+            const goalLabels = {
+                hypertrophy: 'Superávit • Hipertrofia',
+                fatloss: 'Déficit • Reducción de Peso',
+                recomp: 'Equilibrio • Recomposición'
+            };
+            document.getElementById('fuel-goal-badge').textContent = goalLabels[appState.profile.goal] || 'Objetivo Activo';
             document.getElementById('fuel-kcal-current').textContent = totalKcal;
             document.getElementById('fuel-kcal-target').textContent = targetKcal;
             document.getElementById('fuel-prot-current').textContent = totalProt;
+            document.getElementById('fuel-prot-target').textContent = targetProt;
 
             const kcalPct = Math.min(100, Math.round((totalKcal / targetKcal) * 100));
-            const protPct = Math.min(100, Math.round((totalProt / 155) * 100));
+            const protPct = Math.min(100, Math.round((totalProt / targetProt) * 100));
 
             document.getElementById('fuel-kcal-bar').style.width = `${kcalPct}%`;
             document.getElementById('fuel-prot-bar').style.width = `${protPct}%`;
@@ -2196,14 +2326,21 @@
             const basketBtn = document.getElementById('basket-calorie-toggle');
             const basketLabel = document.getElementById('basket-toggle-label');
             if (appState.dailyNutrition.isBasketDay) {
-                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-amber-500/20 border-amber-500/50 text-amber-300 flex items-center gap-1.5 transition active:scale-95';
-                basketLabel.textContent = 'Día Básquet (3400 kcal)';
+                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-amber-500/20 border-amber-500/50 text-amber-300 flex items-center gap-1.5 transition active:scale-95 shrink-0';
+                basketLabel.textContent = `Cardio (+${bonusKcal})`;
             } else {
-                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-slate-900 border-slate-700 text-slate-300 flex items-center gap-1.5 transition active:scale-95';
-                basketLabel.textContent = 'Día Normal (3200 kcal)';
+                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-slate-900 border-slate-700 text-slate-300 flex items-center gap-1.5 transition active:scale-95 shrink-0';
+                basketLabel.textContent = `Normal (${baseKcal})`;
             }
 
-            document.getElementById('quick-meal-idea-text').textContent = QUICK_MEAL_IDEAS[appState.ideaIndex % QUICK_MEAL_IDEAS.length];
+            const ideas = QUICK_MEAL_IDEAS_BY_GOAL[appState.profile.goal] || QUICK_MEAL_IDEAS_BY_GOAL.hypertrophy;
+            document.getElementById('quick-meal-title').textContent = appState.profile.goal === 'fatloss'
+                ? 'Snack Saciante (Bajo en Kcal)'
+                : 'Idea Rápida (En 2 min)';
+            document.getElementById('quick-meal-idea-text').textContent = ideas[appState.ideaIndex % ideas.length];
+
+            document.getElementById('weight-goal-subtitle').textContent =
+                `Estatura: ${(appState.profile.heightM || 1.80).toFixed(2)}m • Meta: ${(appState.profile.targetWeightKg || 75.0).toFixed(1)} kg`;
 
             renderWeightChart();
             updateHeaderStats();
@@ -2215,22 +2352,24 @@
             saveAppState();
         }
 
-        function toggleBasketBonusToday() {
+        function toggleCardioBonusToday() {
             appState.dailyNutrition.isBasketDay = !appState.dailyNutrition.isBasketDay;
             renderNutritionTab();
             saveAppState();
-            showToast(appState.dailyNutrition.isBasketDay ? 'Meta subida a 3400 kcal por Básquet' : 'Meta estándar: 3200 kcal');
+            const bonus = appState.profile.cardioBonusKcal || 200;
+            showToast(appState.dailyNutrition.isBasketDay ? `Meta ajustada +${bonus} kcal por Cardio/Deporte` : `Meta estándar: ${appState.profile.kcalTarget} kcal`);
         }
 
         function cycleQuickMealIdea() {
-            appState.ideaIndex = (appState.ideaIndex + 1) % QUICK_MEAL_IDEAS.length;
-            document.getElementById('quick-meal-idea-text').textContent = QUICK_MEAL_IDEAS[appState.ideaIndex];
+            const ideas = QUICK_MEAL_IDEAS_BY_GOAL[appState.profile.goal] || QUICK_MEAL_IDEAS_BY_GOAL.hypertrophy;
+            appState.ideaIndex = (appState.ideaIndex + 1) % ideas.length;
+            document.getElementById('quick-meal-idea-text').textContent = ideas[appState.ideaIndex];
         }
 
         function logBodyWeight() {
             const input = document.getElementById('weight-input');
             const val = parseFloat(input.value);
-            if (isNaN(val) || val < 40 || val > 180) return;
+            if (isNaN(val) || val < 35 || val > 220) return;
 
             const now = new Date();
             const label = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -2250,13 +2389,15 @@
             const latest = history[history.length - 1]?.weight || 75.0;
             document.getElementById('weight-input').value = latest.toFixed(1);
 
-            const minW = Math.min(73.5, ...history.map(h => h.weight)) - 0.5;
-            const maxW = Math.max(80.0, ...history.map(h => h.weight)) + 0.5;
+            const weights = history.map(h => h.weight);
+            const minW = Math.min(...weights) - 1.5;
+            const maxW = Math.max(...weights, appState.profile.targetWeightKg || latest) + 1.5;
+            const span = Math.max(1, maxW - minW);
 
             container.innerHTML = `
                 <div class="flex items-end justify-between gap-2 h-28 pt-4 px-2 bg-slate-900/70 rounded-xl border border-slate-800">
                     ${history.map((entry, idx) => {
-                        const pct = Math.max(15, Math.min(100, ((entry.weight - minW) / (maxW - minW)) * 100));
+                        const pct = Math.max(15, Math.min(100, ((entry.weight - minW) / span) * 100));
                         const isLast = idx === history.length - 1;
                         return `
                         <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
@@ -2271,14 +2412,19 @@
         }
 
         function updateHeaderStats() {
+            const items = getNutritionItemsForGoal();
             let totalProt = 0;
-            NUTRITION_ITEMS.forEach(item => {
+            items.forEach(item => {
                 if (appState.dailyNutrition[item.key]) totalProt += item.prot;
             });
             const latestWeight = appState.weightHistory[appState.weightHistory.length - 1]?.weight || 75.0;
-            const targetKcal = appState.dailyNutrition.isBasketDay ? 3400 : 3200;
+            const baseKcal = appState.profile.kcalTarget || 2600;
+            const bonus = appState.profile.cardioBonusKcal || 200;
+            const targetKcal = appState.dailyNutrition.isBasketDay ? (baseKcal + bonus) : baseKcal;
 
+            document.getElementById('header-height').textContent = `${(appState.profile.heightM || 1.80).toFixed(2)}m`;
             document.getElementById('header-prot').textContent = totalProt;
+            document.getElementById('header-prot-target').textContent = appState.profile.proteinTarget || 150;
             document.getElementById('header-weight').textContent = `${latestWeight.toFixed(1)} kg`;
             document.getElementById('header-kcal').textContent = `${targetKcal} kcal`;
         }
@@ -2301,7 +2447,6 @@
                 : `${Math.round(totalVol)} kg`;
             document.getElementById('metrics-avg-volume').textContent = `${avgVol.toLocaleString('es-ES')} kg`;
 
-            // Renderizar las 3 métricas si la pestaña es visible
             if (appState.currentTab === 'historial' && typeof Chart !== 'undefined') {
                 renderMetric1VolumeChart(gymLogs);
                 populateMetric2ExerciseSelect();
@@ -2309,7 +2454,6 @@
                 renderMetric3DistributionChart();
             }
 
-            // Renderizar PRs / Fantasmas
             const prContainer = document.getElementById('pr-list-container');
             const ghostKeys = Object.keys(appState.ghostHistory);
 
@@ -2338,7 +2482,6 @@
                 }).join('');
             }
 
-            // Renderizar bitácora de sesiones
             const logsContainer = document.getElementById('workout-history-list');
             if (appState.workoutLogs.length === 0) {
                 logsContainer.innerHTML = `
@@ -2364,7 +2507,6 @@
             }
         }
 
-        // MÉTRICA 1: Volumen Total por Sesión
         function renderMetric1VolumeChart(gymLogs) {
             const emptyEl = document.getElementById('chart-volume-empty');
             const deltaEl = document.getElementById('metric1-delta');
@@ -2382,7 +2524,6 @@
             }
             emptyEl.classList.add('hidden');
 
-            // Últimas 10 sesiones en orden cronológico
             const recent = [...gymLogs].slice(0, 10).reverse();
             const labels = recent.map(l => `${l.date}`);
             const values = recent.map(l => Math.round(l.volume));
@@ -2440,7 +2581,6 @@
             });
         }
 
-        // MÉTRICA 2: Progresión de Fuerza (1RM Estimado + Peso Máximo por Ejercicio)
         function populateMetric2ExerciseSelect() {
             const select = document.getElementById('metric2-exercise-select');
             const prevSelected = select.value;
@@ -2495,7 +2635,6 @@
                 }
             });
 
-            // Fallback si solo existe en ghostHistory
             if (points.length === 0 && appState.ghostHistory[exName]) {
                 const g = appState.ghostHistory[exName];
                 points.push({
@@ -2570,7 +2709,6 @@
             });
         }
 
-        // MÉTRICA 3: Distribución por Tipo de Día (Balance Gym + Básquet)
         function renderMetric3DistributionChart() {
             const emptyEl = document.getElementById('chart-distribution-empty');
             const ratioEl = document.getElementById('metric3-basket-ratio');
@@ -2590,16 +2728,19 @@
 
             const counts = {};
             let gymCount = 0;
-            let basketCount = 0;
+            let cardioCount = 0;
 
             appState.workoutLogs.forEach(log => {
                 const key = log.title || 'Otro';
                 counts[key] = (counts[key] || 0) + 1;
-                if (key.includes('Básquet') || log.dayId === 'basket') basketCount++;
-                else gymCount++;
+                if (log.dayId === 'cardio' || log.dayId === 'basket' || key.includes('Básquet') || key.includes('🏃') || key.includes('Cardio')) {
+                    cardioCount++;
+                } else {
+                    gymCount++;
+                }
             });
 
-            ratioEl.textContent = `${gymCount} Gym • ${basketCount} Básquet`;
+            ratioEl.textContent = `${gymCount} Pesas • ${cardioCount} Cardio`;
 
             const labels = Object.keys(counts);
             const values = Object.values(counts);
@@ -2631,49 +2772,113 @@
         }
 
         // ----------------------------------------------------
-        // 9. PESTAÑA "CALENDARIO" (MODOS DE SEMANA)
+        // 9. PESTAÑA "PROGRAMAS Y CALENDARIO"
         // ----------------------------------------------------
-        const SCHEDULES = {
-            standard: [
-                { dayName: 'Lunes', plan: 'Día 1: Empuje + Cuádriceps', targetDayId: 'day1', note: 'Piernas frescas lejos del jueves', icon: 'ph-barbell' },
-                { dayName: 'Martes', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: '48h antes del partido de básquet', icon: 'ph-barbell' },
-                { dayName: 'Miércoles', plan: 'Descanso o Día 4 (Torso/Brazos)', targetDayId: 'day4', note: 'Cero impacto en piernas para mañana', icon: 'ph-person-arms-spread' },
-                { dayName: 'Jueves', plan: '🏀 Partido de Básquet', targetDayId: 'basket', note: 'Piernas al 100% • Meta: 3.400 kcal', icon: 'ph-basketball', isHighlight: true },
+        const PROGRAM_SCHEDULES = {
+            hypertrophy_sport_standard: [
+                { dayName: 'Lunes', plan: 'Día 1: Empuje + Cuádriceps', targetDayId: 'day1', note: 'Piernas frescas lejos del partido', icon: 'ph-barbell' },
+                { dayName: 'Martes', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: '48h antes del día de deporte', icon: 'ph-barbell' },
+                { dayName: 'Miércoles', plan: 'Descanso o Día 4 (Torso/Brazos)', targetDayId: 'day4', note: 'Cero fatiga de piernas', icon: 'ph-person-arms-spread' },
+                { dayName: 'Jueves', plan: '🏃 Deporte / Cardio Intenso', targetDayId: 'cardio', note: 'Piernas al 100% • Bonus calórico', icon: 'ph-sneaker-move', isHighlight: true },
                 { dayName: 'Viernes', plan: 'Día 3: Full Body Híbrido', targetDayId: 'day3', note: 'Cierre de semana de hipertrofia', icon: 'ph-barbell' },
-                { dayName: 'Sábado / Dom', plan: 'Descanso y Ocio + Superávit', targetDayId: null, note: 'Recuperación muscular completa', icon: 'ph-couch' }
+                { dayName: 'Sáb / Dom', plan: 'Descanso y Recuperación', targetDayId: null, note: 'Cumplir proteína y sueño', icon: 'ph-couch' }
             ],
-            double: [
-                { dayName: 'Lunes', plan: '🏀 Partido de Básquet #1', targetDayId: 'basket', note: 'Arranque aeróbico • Meta: 3.400 kcal', icon: 'ph-basketball', isHighlight: true },
+            hypertrophy_sport_double: [
+                { dayName: 'Lunes', plan: '🏃 Deporte / Cardio #1', targetDayId: 'cardio', note: 'Arranque aeróbico • Bonus calórico', icon: 'ph-sneaker-move', isHighlight: true },
                 { dayName: 'Martes', plan: 'Día 1: Empuje + Cuádriceps', targetDayId: 'day1', note: 'Fuerza base post-lunes', icon: 'ph-barbell' },
-                { dayName: 'Miércoles', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: 'Evitar fallo extremo en femorales', icon: 'ph-barbell' },
-                { dayName: 'Jueves', plan: '🏀 Partido de Básquet #2', targetDayId: 'basket', note: 'Batido HSN + Evocarbs obligatorio', icon: 'ph-basketball', isHighlight: true },
+                { dayName: 'Miércoles', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: 'Evitar fallo extremo en isquios', icon: 'ph-barbell' },
+                { dayName: 'Jueves', plan: '🏃 Deporte / Cardio #2', targetDayId: 'cardio', note: 'Buena hidratación y post-entreno', icon: 'ph-sneaker-move', isHighlight: true },
                 { dayName: 'Viernes', plan: 'Día 3: Full Body Híbrido', targetDayId: 'day3', note: 'Estímulo global de cuerpo completo', icon: 'ph-barbell' },
                 { dayName: 'Sábado', plan: 'Día 4 Opcional (Torso/Brazos)', targetDayId: 'day4', note: 'Solo si tenés tiempo y energía', icon: 'ph-person-arms-spread' }
+            ],
+            fat_loss: [
+                { dayName: 'Lunes', plan: 'Día A: Full Body Fuerza', targetDayId: 'day1', note: 'Proteger masa muscular en déficit', icon: 'ph-barbell' },
+                { dayName: 'Martes', plan: '🔥 Cardio Zona 2 / Caminata', targetDayId: 'cardio', note: '35-45 min ritmo constante', icon: 'ph-fire', isHighlight: true },
+                { dayName: 'Miércoles', plan: 'Día B: Full Body Metabólico', targetDayId: 'day2', note: 'Alto gasto calórico', icon: 'ph-barbell' },
+                { dayName: 'Jueves', plan: '🔥 Cardio HIIT o Pasos Activos', targetDayId: 'cardio', note: '20-30 min intervalos o 10k pasos', icon: 'ph-fire', isHighlight: true },
+                { dayName: 'Viernes', plan: 'Día C: Tono y Resistencia', targetDayId: 'day3', note: 'Cierre semanal metabólico', icon: 'ph-barbell' },
+                { dayName: 'Sáb / Dom', plan: 'Actividad Ligera / Descanso', targetDayId: null, note: 'Caminata recreativa y buena proteína', icon: 'ph-couch' }
+            ],
+            ppl_standard: [
+                { dayName: 'Lunes', plan: 'Push (Pecho / Hombro / Tríceps)', targetDayId: 'day1', note: 'Empuje pesado y volumen', icon: 'ph-barbell' },
+                { dayName: 'Martes', plan: 'Pull (Espalda / Bíceps)', targetDayId: 'day2', note: 'Tracción vertical y horizontal', icon: 'ph-barbell' },
+                { dayName: 'Miércoles', plan: 'Legs (Pierna Completa)', targetDayId: 'day3', note: 'Cuádriceps, isquios y gemelo', icon: 'ph-barbell' },
+                { dayName: 'Jueves', plan: 'Descanso o Cardio Ligero', targetDayId: 'cardio', note: 'Recuperación activa', icon: 'ph-sneaker-move', isHighlight: true },
+                { dayName: 'Viernes', plan: 'Push / Pull / Legs (Rotación)', targetDayId: 'day1', note: 'Podés repetir ciclo (3 a 6 días)', icon: 'ph-arrows-clockwise' },
+                { dayName: 'Sáb / Dom', plan: 'Opcional o Descanso Total', targetDayId: null, note: 'Adaptalo a tu agenda semanal', icon: 'ph-couch' }
+            ],
+            upper_lower: [
+                { dayName: 'Lunes', plan: 'Torso A (Fuerza)', targetDayId: 'day1', note: 'Compuestos pesados de tren superior', icon: 'ph-barbell' },
+                { dayName: 'Martes', plan: 'Pierna A (Cuádriceps)', targetDayId: 'day2', note: 'Sentadilla y prensa', icon: 'ph-barbell' },
+                { dayName: 'Miércoles', plan: 'Descanso o Cardio', targetDayId: 'cardio', note: 'Recuperación a mitad de semana', icon: 'ph-sneaker-move', isHighlight: true },
+                { dayName: 'Jueves', plan: 'Torso B (Hipertrofia)', targetDayId: 'day3', note: 'Mayor volumen y aislados', icon: 'ph-barbell' },
+                { dayName: 'Viernes', plan: 'Pierna B (Posterior)', targetDayId: 'day4', note: 'Peso muerto rumano y glúteo', icon: 'ph-barbell' },
+                { dayName: 'Sáb / Dom', plan: 'Descanso y Recuperación', targetDayId: null, note: 'Dormir bien y cumplir proteína', icon: 'ph-couch' }
             ]
         };
+
+        function selectProgram(programId) {
+            const prog = TRAINING_PROGRAMS[programId];
+            if (!prog) return;
+            appState.activeProgramId = programId;
+            appState.routine = cloneProgramRoutine(programId);
+            appState.selectedDayId = Object.keys(appState.routine)[0];
+
+            // Ajustar sugerencia de objetivo/calorías acorde al programa
+            if (prog.recommendedProfile) {
+                appState.profile.goal = prog.recommendedProfile.goal;
+                appState.profile.kcalTarget = prog.recommendedProfile.kcalTarget;
+                appState.profile.proteinTarget = prog.recommendedProfile.proteinTarget;
+                appState.profile.cardioBonusKcal = prog.recommendedProfile.cardioBonusKcal;
+            }
+
+            renderAll();
+            saveAppState(true);
+            showToast(`Programa activado: ${prog.name}`);
+        }
 
         function setWeekMode(mode) {
             appState.weekMode = mode;
             renderCalendarTab();
             updateBannerSuggestion();
             saveAppState();
-            showToast(mode === 'standard' ? 'Modo: Semana Estándar' : 'Modo: Semana Doble Partido');
+            showToast(mode === 'standard' ? 'Modo: 1 Partido / Semana' : 'Modo: Doble Partido');
         }
 
         function renderCalendarTab() {
-            const isStd = appState.weekMode === 'standard';
-            const btnStd = document.getElementById('mode-btn-standard');
-            const btnDbl = document.getElementById('mode-btn-double');
+            const listEl = document.getElementById('program-selector-list');
+            listEl.innerHTML = Object.values(TRAINING_PROGRAMS).map(prog => {
+                const isActive = appState.activeProgramId === prog.id;
+                return `
+                    <button onclick="selectProgram('${prog.id}')" class="p-3.5 rounded-2xl border text-left transition flex items-start justify-between gap-2 ${isActive ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800 hover:border-slate-600'}">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-sm text-white">${prog.name}</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-emerald-300 border border-slate-700">${prog.badge}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 leading-snug">${prog.description}</p>
+                        </div>
+                        <i class="ph-fill ph-check-circle text-xl shrink-0 ${isActive ? 'text-emerald-400' : 'text-slate-700'}"></i>
+                    </button>
+                `;
+            }).join('');
 
-            btnStd.className = `p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
-            btnDbl.className = `p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${!isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
+            const activeProg = TRAINING_PROGRAMS[appState.activeProgramId] || TRAINING_PROGRAMS.hypertrophy_sport;
+            const weekModeCard = document.getElementById('week-mode-card');
+            weekModeCard.classList.toggle('hidden', !activeProg.hasWeekModes);
 
-            document.getElementById('check-mode-standard').classList.toggle('hidden', !isStd);
-            document.getElementById('check-mode-double').classList.toggle('hidden', isStd);
+            if (activeProg.hasWeekModes) {
+                const isStd = appState.weekMode === 'standard';
+                document.getElementById('mode-btn-standard').className = `p-3 rounded-xl border text-left transition ${isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
+                document.getElementById('mode-btn-double').className = `p-3 rounded-xl border text-left transition ${!isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
+            }
 
-            const scheduleList = SCHEDULES[appState.weekMode];
+            const schedKey = activeProg.hasWeekModes
+                ? `hypertrophy_sport_${appState.weekMode}`
+                : appState.activeProgramId;
+            const scheduleList = PROGRAM_SCHEDULES[schedKey] || PROGRAM_SCHEDULES.hypertrophy_sport_standard;
+
             const grid = document.getElementById('weekly-schedule-grid');
-
             grid.innerHTML = scheduleList.map(item => `
                 <div class="bg-slate-800/75 border ${item.isHighlight ? 'border-amber-500/40' : 'border-slate-700/80'} rounded-2xl p-3 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-3">
@@ -2698,38 +2903,27 @@
         }
 
         function jumpToWorkoutDay(dayId) {
-            appState.selectedDayId = dayId;
+            if (appState.routine[dayId]) {
+                appState.selectedDayId = dayId;
+            }
             switchTab('entrenar');
         }
 
         function updateBannerSuggestion() {
-            const jsDay = new Date().getDay();
-            const modeText = appState.weekMode === 'standard'
-                ? 'Modo: Semana Estándar (Básquet Jueves)'
-                : 'Modo: Semana Doble Partido (Lun y Jue)';
-            document.getElementById('banner-week-mode').textContent = modeText;
+            const activeProg = TRAINING_PROGRAMS[appState.activeProgramId] || TRAINING_PROGRAMS.hypertrophy_sport;
+            document.getElementById('banner-week-mode').textContent = `Programa: ${activeProg.name}`;
 
-            const mapStd = {
-                1: 'Hoy Lunes toca: Día 1 (Empuje + Cuádriceps)',
-                2: 'Hoy Martes toca: Día 2 (Tracción + Isquios)',
-                3: 'Hoy Miércoles: Descanso o Día 4 (Torso/Brazos)',
-                4: 'Hoy Jueves: 🏀 Partido de Básquet (Meta 3400 kcal)',
-                5: 'Hoy Viernes toca: Día 3 (Full Body Híbrido)',
-                6: 'Fin de semana: Descanso y cumplir superávit',
-                0: 'Domingo: Descanso y preparar la semana'
-            };
-            const mapDbl = {
-                1: 'Hoy Lunes: 🏀 Partido de Básquet #1',
-                2: 'Hoy Martes toca: Día 1 (Empuje + Cuádriceps)',
-                3: 'Hoy Miércoles toca: Día 2 (Tracción + Isquios)',
-                4: 'Hoy Jueves: 🏀 Partido de Básquet #2',
-                5: 'Hoy Viernes toca: Día 3 (Full Body Híbrido)',
-                6: 'Hoy Sábado: Día 4 Opcional (Torso/Brazos)',
-                0: 'Domingo: Descanso total y superávit'
-            };
-
-            const text = appState.weekMode === 'standard' ? mapStd[jsDay] : mapDbl[jsDay];
-            document.getElementById('banner-today-plan').textContent = text;
+            const jsDay = new Date().getDay(); // 0 Dom, 1 Lun ... 6 Sab
+            const schedKey = activeProg.hasWeekModes
+                ? `hypertrophy_sport_${appState.weekMode}`
+                : appState.activeProgramId;
+            const list = PROGRAM_SCHEDULES[schedKey] || [];
+            // Índice 0=Lun..4=Vie, 5=Sab/Dom
+            const idx = jsDay === 0 ? 5 : Math.min(5, jsDay - 1);
+            const todayItem = list[idx];
+            document.getElementById('banner-today-plan').textContent = todayItem
+                ? `Hoy (${todayItem.dayName}): ${todayItem.plan}`
+                : 'Hoy es un gran día para entrenar';
         }
 
         // ----------------------------------------------------
@@ -2772,7 +2966,7 @@
             if (!name) return;
 
             const dayObj = appState.routine[appState.selectedDayId];
-            if (!dayObj || dayObj.isBasket) return;
+            if (!dayObj || dayObj.isCardio || dayObj.isBasket) return;
 
             dayObj.exercises.push({
                 id: 'custom_' + Date.now(),
@@ -2782,11 +2976,7 @@
                 type: typeInput.value,
                 defaultWeight: 20,
                 defaultReps: 10,
-                sets: [
-                    { weight: '', reps: '', rir: 1, done: false },
-                    { weight: '', reps: '', rir: 1, done: false },
-                    { weight: '', reps: '', rir: 0, done: false }
-                ]
+                sets: makeSets(3, 0)
             });
 
             nameInput.value = '';
@@ -2796,12 +2986,73 @@
             showToast('Ejercicio agregado al día');
         }
 
-        function updateBasketDuration(val) {
-            appState.basketDuration = parseInt(val) || 60;
+        let editingExerciseIdx = null;
+
+        function openEditExerciseModal(exIdx) {
+            const dayObj = appState.routine[appState.selectedDayId];
+            if (!dayObj || !dayObj.exercises || !dayObj.exercises[exIdx]) return;
+            editingExerciseIdx = exIdx;
+            const ex = dayObj.exercises[exIdx];
+            const currentName = ex.variants[ex.selectedVariant] || ex.variants[0] || '';
+
+            document.getElementById('edit-ex-name').value = currentName;
+            document.getElementById('edit-ex-reps').value = ex.targetReps || '10-12 reps';
+            document.getElementById('edit-ex-type').value = ex.type || 'isolation';
+
+            const m = document.getElementById('modal-edit-exercise');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
         }
 
-        function updateBasketIntensity(val) {
-            appState.basketSessionIntensity = val;
+        function closeEditExerciseModal() {
+            editingExerciseIdx = null;
+            const m = document.getElementById('modal-edit-exercise');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function confirmEditExercise() {
+            if (editingExerciseIdx === null) return;
+            const dayObj = appState.routine[appState.selectedDayId];
+            const ex = dayObj?.exercises?.[editingExerciseIdx];
+            if (!ex) return;
+
+            const newName = document.getElementById('edit-ex-name').value.trim();
+            if (!newName) {
+                showToast('Escribí un nombre para el ejercicio');
+                return;
+            }
+            ex.variants[ex.selectedVariant] = newName;
+            ex.targetReps = document.getElementById('edit-ex-reps').value.trim() || ex.targetReps;
+            ex.type = document.getElementById('edit-ex-type').value;
+
+            closeEditExerciseModal();
+            renderExercisesList();
+            saveAppState();
+            showToast(`Ejercicio actualizado: ${newName}`);
+        }
+
+        function deleteEditingExercise() {
+            if (editingExerciseIdx === null) return;
+            const dayObj = appState.routine[appState.selectedDayId];
+            if (!dayObj || !dayObj.exercises) return;
+            dayObj.exercises.splice(editingExerciseIdx, 1);
+            closeEditExerciseModal();
+            renderExercisesList();
+            saveAppState();
+            showToast('Ejercicio eliminado del día');
+        }
+
+        function updateCardioActivity(val) {
+            appState.cardioActivity = val;
+        }
+
+        function updateCardioDuration(val) {
+            appState.cardioDuration = parseInt(val) || 45;
+        }
+
+        function updateCardioIntensity(val) {
+            appState.cardioIntensity = val;
         }
 
         function openResetConfirmModal() {
@@ -2817,7 +3068,7 @@
         }
 
         function confirmResetAllData() {
-            appState.routine = JSON.parse(JSON.stringify(INITIAL_ROUTINE));
+            appState.routine = cloneProgramRoutine(appState.activeProgramId);
             appState.ghostHistory = {};
             appState.workoutLogs = [];
             appState.weightHistory = [{ date: 'Inicio', weight: 75.0 }];
