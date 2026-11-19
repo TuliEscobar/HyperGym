@@ -554,11 +554,9 @@
                     <span id="drive-status-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">Desconectado</span>
                 </div>
 
-                <div>
-                    <label class="text-[11px] text-slate-400 font-semibold block mb-1">Google OAuth Client ID</label>
-                    <input id="google-client-id-input" type="text" placeholder="123456789-xxxx.apps.googleusercontent.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
-                    <p class="text-[10px] text-slate-500 mt-1">Guarda <code class="text-slate-300">hypergym_data.json</code> y <code class="text-slate-300">hypergym_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperGym_Data</code> de tu Drive.</p>
-                </div>
+                <p class="text-[11px] text-slate-400 leading-snug">
+                    Guardá y sincronizá automáticamente <code class="text-slate-300">hypergym_data.json</code> y <code class="text-slate-300">hypergym_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperGym_Data</code> de tu Drive.
+                </p>
 
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="connectGoogleDrive()" id="btn-connect-drive" class="col-span-2 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
@@ -573,6 +571,13 @@
                     </button>
                 </div>
                 <p id="drive-last-sync" class="text-[10px] text-slate-400 text-center hidden"></p>
+
+                <details class="pt-1 border-t border-slate-700/60">
+                    <summary class="text-[10px] text-slate-500 hover:text-slate-300 cursor-pointer select-none font-semibold">Configuración avanzada (OAuth Client ID)</summary>
+                    <div class="mt-2">
+                        <input id="google-client-id-input" type="text" placeholder="123456789-xxxx.apps.googleusercontent.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-[11px] font-mono text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </details>
             </div>
 
             <!-- Importar / Exportar Historial -->
@@ -779,7 +784,7 @@
         // (Si pegás tu Client ID acá, cualquiera que abra este .html
         //  podrá tocar "Conectar con Google Drive" sin configurarlo)
         // ----------------------------------------------------
-        const DEFAULT_GOOGLE_CLIENT_ID = '';
+        const DEFAULT_GOOGLE_CLIENT_ID = '1043235072298-7t23cj4r01oll1452hp82afkghv11rnb.apps.googleusercontent.com';
 
         const STORAGE_KEY = 'hypergym_app_state_v3';
         const LEGACY_STORAGE_KEY = 'hyperhoops_app_state_v2';
@@ -1332,12 +1337,14 @@
                 showToast('Abrí el HTML desde https:// (GitHub Pages/Netlify) para usar Google Drive');
                 return;
             }
-            const inputVal = document.getElementById('google-client-id-input').value.trim();
+            const inputVal = (document.getElementById('google-client-id-input')?.value || '').trim() || getSavedClientId();
             if (!inputVal) {
-                showToast('Pegá tu Google OAuth Client ID primero');
+                showToast('Configurá tu Google OAuth Client ID primero');
                 return;
             }
-            localStorage.setItem(CLIENT_ID_STORAGE_KEY, inputVal);
+            if (inputVal !== DEFAULT_GOOGLE_CLIENT_ID) {
+                localStorage.setItem(CLIENT_ID_STORAGE_KEY, inputVal);
+            }
 
             if (!window.google || !google.accounts || !google.accounts.oauth2) {
                 showToast('Cargando librería de Google... intentá de nuevo en 2s');
