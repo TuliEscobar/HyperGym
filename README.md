@@ -1,8 +1,10 @@
 # 🏋️ HyperGym — Tracker Universal de Gimnasio, Nutrición y Métricas
 
+![HyperGym Preview](./og-preview.jpg)
+
 Aplicación web autocontenida en **un solo archivo `.html`** pensada para cualquier persona que quiera registrar sus entrenamientos de gimnasio, nutrición, peso corporal y métricas de progreso — con funcionamiento 100% offline y sincronización con **Google Drive**.
 
-🔗 **App en vivo (GitHub Pages):** https://tuliescobar.github.io/hyperhoops/
+🔗 **App en vivo (GitHub Pages):** https://tuliescobar.github.io/HyperGym/
 
 ---
 
@@ -36,7 +38,7 @@ Aplicación web autocontenida en **un solo archivo `.html`** pensada para cualqu
 
 ## 📱 Cómo instalarla en tu celular
 
-1. Abrí **https://tuliescobar.github.io/hyperhoops/** desde el navegador del celular:
+1. Abrí **https://tuliescobar.github.io/HyperGym/** desde el navegador del celular:
    - **Android (Chrome):** menú `⋮` → **Instalar aplicación** / **Añadir a pantalla de inicio**.
    - **iPhone (Safari):** botón **Compartir** (`↑`) → **Añadir a pantalla de inicio**.
 

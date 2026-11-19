@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HyperGym | Tracker de Entrenamiento, Nutrición y Métricas</title>
+    <meta name="description" content="App gratuita e instalable (PWA) para registrar tus entrenamientos de gimnasio (Hipertrofia, Reducción de Peso, Push/Pull/Legs y Torso/Pierna), controlar nutrición, ver métricas de progreso y sincronizar todo con tu Google Drive.">
+
+    <!-- Open Graph / WhatsApp / Telegram / LinkedIn / Facebook Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="HyperGym">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:url" content="https://tuliescobar.github.io/HyperGym/">
+    <meta property="og:title" content="HyperGym — Rutinas de Gimnasio, Nutrición, Métricas y Google Drive">
+    <meta property="og:description" content="Registrá series, pesos fantasma, RIR y descansos 100% offline. Incluye 4 programas (Hipertrofia, Quema Grasa, PPL, Torso/Pierna), gráficos de 1RM/volumen y respaldo automático en tu Google Drive.">
+    <meta property="og:image" content="https://tuliescobar.github.io/HyperGym/og-preview.jpg">
+    <meta property="og:image:secure_url" content="https://tuliescobar.github.io/HyperGym/og-preview.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="HyperGym — Tracker de Entrenamiento, Nutrición, Métricas y Google Drive">
+
+    <!-- Twitter / X Card Preview -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HyperGym — Rutinas, Nutrición, Métricas y Google Drive">
+    <meta name="twitter:description" content="App PWA gratuita de gimnasio: 4 programas editables, temporizador de descanso, 3 gráficos de progreso y sincronización con Google Drive.">
+    <meta name="twitter:image" content="https://tuliescobar.github.io/HyperGym/og-preview.jpg">
 
     <!-- PWA & Mobile Install Meta Tags -->
     <meta name="theme-color" content="#0f172a">
@@ -11,8 +32,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="HyperGym">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='6' y='6' width='88' height='88' rx='20' fill='none' stroke='%2310b981' stroke-width='5'/%3E%3Ctext x='50' y='66' font-size='48' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230f172a'/%3E%3Crect x='10' y='10' width='160' height='160' rx='34' fill='none' stroke='%2310b981' stroke-width='8'/%3E%3Ctext x='90' y='118' font-size='84' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="./icon-512.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -768,22 +789,25 @@
         const DRIVE_CSV_FILENAME = 'hypergym_metricas.csv';
         const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-        // Generar manifest PWA dinámico en un solo archivo
+        // Generar manifest PWA dinámico
         (function injectInlineManifest() {
             try {
+                const iconUrl = new URL('./icon-512.png', window.location.href).href;
                 const manifest = {
                     name: 'HyperGym | Entrenamiento y Métricas',
                     short_name: 'HyperGym',
-                    start_url: '.',
+                    description: 'Tracker de gimnasio, nutrición, métricas de fuerza y respaldo en Google Drive.',
+                    start_url: window.location.href.split('#')[0],
                     display: 'standalone',
                     background_color: '#0f172a',
                     theme_color: '#0f172a',
                     orientation: 'portrait',
                     icons: [
                         {
-                            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f172a'/%3E%3Crect x='10' y='10' width='172' height='172' rx='36' fill='none' stroke='%2310b981' stroke-width='10'/%3E%3Ctext x='96' y='125' font-size='86' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHG%3C/text%3E%3C/svg%3E",
-                            sizes: '192x192',
-                            type: 'image/svg+xml'
+                            src: iconUrl,
+                            sizes: '512x512',
+                            type: 'image/png',
+                            purpose: 'any maskable'
                         }
                     ]
                 };
