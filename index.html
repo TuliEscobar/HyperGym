@@ -1,0 +1,2858 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HyperHoops | Hipertrofia + Básquet Tracker</title>
+
+    <!-- PWA & Mobile Install Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HyperHoops">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='6' y='6' width='88' height='88' rx='20' fill='none' stroke='%2310b981' stroke-width='5'/%3E%3Ctext x='50' y='66' font-size='48' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230f172a'/%3E%3Crect x='10' y='10' width='160' height='160' rx='34' fill='none' stroke='%2310b981' stroke-width='8'/%3E%3Ctext x='90' y='118' font-size='84' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Tone.js for Timer Audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Chart.js for Metrics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- Google Identity Services (OAuth 2.0 for Google Drive) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#162032',
+                            900: '#0f172a',
+                            950: '#080d1a',
+                        },
+                        emerald: {
+                            450: '#10b981',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            overscroll-behavior-y: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(16, 185, 129, 0.9); box-shadow: 0 0 15px rgba(16, 185, 129, 0.35); }
+            50% { border-color: rgba(16, 185, 129, 0.2); box-shadow: 0 0 4px rgba(16, 185, 129, 0.1); }
+        }
+        .timer-finished {
+            animation: pulse-border 1s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none pb-28">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <i class="ph-bold ph-barbell text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-extrabold text-base tracking-tight text-white">HYPER<span class="text-emerald-400">HOOPS</span></h1>
+                        <button onclick="openDriveModal()" id="sync-badge" title="Configurar Google Drive y Respaldo" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 transition active:scale-95">
+                            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span id="sync-label">Local</span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium">1.85m • <span id="header-weight" class="text-slate-200 font-mono">75.0 kg</span> • Meta: <span id="header-kcal" class="text-amber-400 font-mono">3200 kcal</span></p>
+                </div>
+            </div>
+
+            <!-- Botón rápido de estado nutricional del día -->
+            <button onclick="switchTab('combustible')" class="bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 transition active:scale-95">
+                <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Proteína Hoy</div>
+                    <div class="text-xs font-mono font-bold text-emerald-400"><span id="header-prot">0</span>/155g</div>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                    <i class="ph-fill ph-lightning text-base"></i>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="flex-1 max-w-md w-full mx-auto px-3.5 pt-3 space-y-4">
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 1: ENTRENAR (RUTINA INTERACTIVA)   -->
+        <!-- ========================================== -->
+        <section id="tab-entrenar" class="space-y-4">
+
+            <!-- Banner de recomendación según el día de la semana -->
+            <div id="today-suggestion-banner" class="bg-gradient-to-r from-slate-800/90 via-slate-800/70 to-emerald-950/40 border border-slate-700/80 rounded-2xl p-3 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="ph-fill ph-calendar-check text-emerald-400 text-xl"></i>
+                    <div>
+                        <div class="text-[11px] text-slate-400 font-medium" id="banner-week-mode">Modo: Semana Estándar</div>
+                        <div class="text-xs font-bold text-slate-100" id="banner-today-plan">Hoy es un gran día para darle duro</div>
+                    </div>
+                </div>
+                <button onclick="switchTab('calendario')" class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg active:scale-95">
+                    Cambiar
+                </button>
+            </div>
+
+            <!-- Selector de Días (Pills Horizontales) -->
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1" id="day-selector-container"></div>
+
+            <!-- Cabecera del Día Seleccionado -->
+            <div id="workout-day-header" class="bg-slate-800/60 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between">
+                <div>
+                    <h2 id="day-title" class="font-bold text-base text-white">Día 1: Empuje + Cuádriceps</h2>
+                    <p id="day-subtitle" class="text-xs text-slate-400 mt-0.5">RIR 1-2 en básicos • RIR 0 última serie analíticos</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Volumen Hoy</span>
+                    <span id="current-session-volume" class="font-mono font-bold text-sm text-emerald-400">0 kg</span>
+                </div>
+            </div>
+
+            <!-- Lista de Ejercicios o Vista de Básquet -->
+            <div id="exercises-list" class="space-y-3.5"></div>
+
+            <!-- Botón para agregar ejercicio extra -->
+            <div id="add-exercise-wrapper" class="pt-1">
+                <button onclick="openAddExerciseModal()" class="w-full py-3 rounded-2xl border border-dashed border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500 text-xs font-semibold flex items-center justify-center gap-2 transition active:scale-98">
+                    <i class="ph-bold ph-plus-circle text-base"></i>
+                    Agregar Ejercicio Personalizado al Día
+                </button>
+            </div>
+
+            <!-- Botón Finalizar Entrenamiento -->
+            <div class="pt-2 pb-6">
+                <button onclick="finishWorkoutSession()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-sm tracking-wide transition active:scale-98">
+                    <i class="ph-bold ph-check-circle text-xl"></i>
+                    <span id="finish-btn-text">FINALIZAR Y GUARDAR ENTRENAMIENTO</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 2: COMBUSTIBLE (NUTRICIÓN Y PESO)  -->
+        <!-- ========================================== -->
+        <section id="tab-combustible" class="hidden space-y-4 pb-8">
+
+            <!-- Tarjeta Resumen de Macros del Día -->
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Superávit Hipertrofia</span>
+                        <h2 class="text-lg font-extrabold text-white">Combustible Diario</h2>
+                    </div>
+                    <button onclick="toggleBasketBonusToday()" id="basket-calorie-toggle" class="px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition active:scale-95">
+                        <i class="ph-fill ph-basketball text-base"></i>
+                        <span id="basket-toggle-label">Día Normal (3200 kcal)</span>
+                    </button>
+                </div>
+
+                <!-- Barra de Calorías -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-300 font-medium">Calorías Estimadas</span>
+                        <span class="font-mono font-bold text-amber-400"><span id="fuel-kcal-current">0</span> / <span id="fuel-kcal-target">3200</span> kcal</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700/60">
+                        <div id="fuel-kcal-bar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Barra de Proteína -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-300 font-medium">Proteína Total (1.8 - 2.2g/kg)</span>
+                        <span class="font-mono font-bold text-emerald-400"><span id="fuel-prot-current">0</span> / 155 g</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700/60">
+                        <div id="fuel-prot-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkboxes de 1-Toque (Comidas + Suplementación HSN) -->
+            <div class="space-y-2.5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Checks Rápidos de Hoy</h3>
+                <div id="nutrition-checks-list" class="space-y-2"></div>
+            </div>
+
+            <!-- Generador de Ideas para la 4.ª Comida / Extra Calórico -->
+            <div class="bg-slate-800/60 border border-amber-500/30 rounded-2xl p-4 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-fill ph-lightbulb text-amber-400 text-lg"></i>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Salvavidas 4.ª Comida (En 2 min)</h4>
+                    </div>
+                    <button onclick="cycleQuickMealIdea()" class="text-xs font-semibold text-slate-300 bg-slate-700/70 hover:bg-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Otra idea
+                    </button>
+                </div>
+                <p id="quick-meal-idea-text" class="text-xs text-slate-200 leading-relaxed font-medium bg-slate-900/70 p-3 rounded-xl border border-slate-800"></p>
+            </div>
+
+            <!-- Evolución del Peso Corporal -->
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Evolución Peso Corporal</h3>
+                        <p class="text-[11px] text-slate-400">Arranque: 75.0 kg (1.85m) • Meta fase 1: 78.5 kg</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input id="weight-input" type="number" step="0.1" value="75.0" class="w-20 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-center font-mono text-sm font-bold text-white focus:outline-none focus:border-emerald-500">
+                        <button onclick="logBodyWeight()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition active:scale-95">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gráfico visual de barras -->
+                <div id="weight-chart-container" class="pt-2"></div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 3: MÉTRICAS E HISTORIAL            -->
+        <!-- ========================================== -->
+        <section id="tab-historial" class="hidden space-y-4 pb-8">
+
+            <!-- Tarjeta Resumen + Acceso rápido a Drive/Importar -->
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Sobrecarga Progresiva</span>
+                        <h2 class="text-lg font-extrabold text-white">Métricas e Historial</h2>
+                    </div>
+                    <button onclick="openDriveModal()" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 text-xs font-bold flex items-center gap-1.5 transition active:scale-95">
+                        <i class="ph-fill ph-google-drive-logo text-base"></i>
+                        Drive / Datos
+                    </button>
+                </div>
+
+                <!-- KPIs rápidos -->
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase block">Sesiones</span>
+                        <span id="history-total-sessions" class="font-mono text-base font-extrabold text-emerald-400">0</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase block">Vol. Total</span>
+                        <span id="metrics-total-tonnage" class="font-mono text-base font-extrabold text-white">0t</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase block">Prom/Sesión</span>
+                        <span id="metrics-avg-volume" class="font-mono text-base font-extrabold text-amber-400">0 kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 3 MÉTRICAS INTERACTIVAS (CHART.JS)         -->
+            <!-- ========================================== -->
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1 flex items-center gap-1.5">
+                    <i class="ph-fill ph-chart-bar text-emerald-400"></i> Panel de Métricas
+                </h3>
+
+                <!-- MÉTRICA 1: Volumen Total por Sesión -->
+                <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase text-emerald-400 font-bold">Métrica 1 • Tonelaje</span>
+                            <h4 class="text-sm font-extrabold text-white">Volumen Total por Sesión (kg)</h4>
+                        </div>
+                        <span id="metric1-delta" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">--</span>
+                    </div>
+                    <div class="relative h-44 w-full">
+                        <canvas id="chart-volume"></canvas>
+                        <div id="chart-volume-empty" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-500 text-center px-4">
+                            Registrá o importá al menos 1 sesión de pesas para ver la curva de volumen.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÉTRICA 2: Progresión de Fuerza (1RM Estimado + Peso Máx por Ejercicio) -->
+                <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase text-amber-400 font-bold">Métrica 2 • Fuerza (Epley 1RM)</span>
+                            <h4 class="text-sm font-extrabold text-white">Progresión por Ejercicio</h4>
+                        </div>
+                        <span id="metric2-best-1rm" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">1RM: --</span>
+                    </div>
+                    <select id="metric2-exercise-select" onchange="renderMetric2Chart()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-emerald-500">
+                        <option value="">Seleccionar ejercicio...</option>
+                    </select>
+                    <div class="relative h-44 w-full">
+                        <canvas id="chart-strength"></canvas>
+                        <div id="chart-strength-empty" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-500 text-center px-4">
+                            Elegí un ejercicio con sesiones registradas para ver su evolución de carga y 1RM estimado.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÉTRICA 3: Distribución de Sesiones y Balance de Rutina -->
+                <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase text-sky-400 font-bold">Métrica 3 • Balance</span>
+                            <h4 class="text-sm font-extrabold text-white">Distribución por Tipo de Día</h4>
+                        </div>
+                        <span id="metric3-basket-ratio" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-sky-300 border border-slate-700">Gym / Básquet</span>
+                    </div>
+                    <div class="relative h-44 w-full">
+                        <canvas id="chart-distribution"></canvas>
+                        <div id="chart-distribution-empty" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-500 text-center px-4">
+                            Acá verás qué días entrenás más (Empuje, Tracción, Full Body, Torso y Básquet).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mejores Marcas por Ejercicio (PRs) -->
+            <div class="space-y-2 pt-1">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Últimas Cargas Registradas (Fantasmas)</h3>
+                <div id="pr-list-container" class="grid grid-cols-1 gap-2"></div>
+            </div>
+
+            <!-- Historial Cronológico de Entrenamientos -->
+            <div class="space-y-2 pt-2">
+                <div class="flex items-center justify-between px-1">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Bitácora de Entrenamientos</h3>
+                    <button onclick="openResetConfirmModal()" class="text-[11px] text-rose-400 hover:underline">Reiniciar datos</button>
+                </div>
+                <div id="workout-history-list" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 4: CALENDARIO (MODO DE SEMANA)     -->
+        <!-- ========================================== -->
+        <section id="tab-calendario" class="hidden space-y-4 pb-8">
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 space-y-3">
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Adaptación Inteligente</span>
+                <h2 class="text-lg font-extrabold text-white">Planificador Gimnasio + Básquet</h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Elegí qué tipo de semana tenés para acomodar los descansos y nunca llegar con las piernas cargadas al partido del jueves.
+                </p>
+
+                <!-- Botones de Modo de Semana -->
+                <div class="grid grid-cols-1 gap-2.5 pt-1">
+                    <button onclick="setWeekMode('standard')" id="mode-btn-standard" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-sm text-white flex items-center gap-2">
+                                <span>Semana Estándar (Básquet Jueves)</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-0.5">Lun Día 1 • Mar Día 2 • Mié Descanso/Día 4 • Jue Básquet • Vie Día 3</p>
+                        </div>
+                        <i class="ph-fill ph-check-circle text-xl text-emerald-400" id="check-mode-standard"></i>
+                    </button>
+
+                    <button onclick="setWeekMode('double')" id="mode-btn-double" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-sm text-white flex items-center gap-2">
+                                <span>Semana Doble Partido (Lun y Jue)</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-0.5">Lun Básquet • Mar Día 1 • Mié Día 2 • Jue Básquet • Vie Día 3 • Sáb Día 4</p>
+                        </div>
+                        <i class="ph-fill ph-check-circle text-xl text-emerald-400 hidden" id="check-mode-double"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grilla Semanal Interactiva -->
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Estructura de la Semana</h3>
+                <div id="weekly-schedule-grid" class="space-y-2"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- TEMPORIZADOR FLOTANTE (STICKY BAR)         -->
+    <!-- ========================================== -->
+    <div id="floating-timer" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-md bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-2xl px-3.5 py-2.5 shadow-2xl transition-all duration-300 translate-y-24 opacity-0 pointer-events-none">
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+                <button onclick="toggleTimerPause()" id="timer-play-pause-btn" class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center active:scale-90">
+                    <i id="timer-play-icon" class="ph-fill ph-pause text-lg"></i>
+                </button>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider font-bold text-slate-400" id="timer-label">Descanso en curso</div>
+                    <div class="font-mono text-xl font-extrabold text-white leading-none mt-0.5" id="timer-display">02:30</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <button onclick="adjustTimer(-15)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono font-bold text-slate-300 border border-slate-700 active:scale-95">-15s</button>
+                <button onclick="adjustTimer(15)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono font-bold text-slate-300 border border-slate-700 active:scale-95">+15s</button>
+                <button onclick="stopTimer()" class="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center active:scale-95">
+                    <i class="ph-bold ph-x text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: GOOGLE DRIVE OAUTH + IMPORTAR/EXP   -->
+    <!-- ========================================== -->
+    <div id="modal-drive" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl my-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-google-drive-logo text-2xl text-emerald-400"></i>
+                    <h3 class="font-extrabold text-base text-white">Google Drive y Datos</h3>
+                </div>
+                <button onclick="closeDriveModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Aviso si está abierto como file:// -->
+            <div id="drive-file-warning" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-[11px] text-amber-200 leading-relaxed">
+                <strong>Nota importante:</strong> Estás abriendo el archivo localmente (<code class="font-mono">file://</code>). Google bloquea el inicio de sesión OAuth desde archivos locales. Para conectar Google Drive, subí este único <code class="font-mono">.html</code> gratis a <strong>GitHub Pages</strong> o <strong>Netlify</strong> (<code class="font-mono">https://</code>). Mientras tanto, todo se guarda automáticamente en tu celular y podés exportar/importar JSON y CSV abajo.
+            </div>
+
+            <!-- Estado de conexión Google Drive -->
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">Google Drive (OAuth 2.0)</span>
+                    <span id="drive-status-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">Desconectado</span>
+                </div>
+
+                <div>
+                    <label class="text-[11px] text-slate-400 font-semibold block mb-1">Google OAuth Client ID</label>
+                    <input id="google-client-id-input" type="text" placeholder="123456789-xxxx.apps.googleusercontent.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                    <p class="text-[10px] text-slate-500 mt-1">Se guarda en tu navegador. Guarda <code class="text-slate-300">hyperhoops_data.json</code> y <code class="text-slate-300">hyperhoops_metricas.csv</code> en la carpeta <code class="text-slate-300">HyperHoops_Gym</code> de tu Drive.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="connectGoogleDrive()" id="btn-connect-drive" class="col-span-2 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
+                        <i class="ph-bold ph-sign-in text-base"></i>
+                        <span id="btn-connect-drive-text">Conectar con Google Drive</span>
+                    </button>
+                    <button onclick="syncNowToDrive()" id="btn-sync-up" class="hidden py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-cloud-arrow-up"></i> Subir a Drive
+                    </button>
+                    <button onclick="loadFromGoogleDrive(true)" id="btn-sync-down" class="hidden py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center justify-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-cloud-arrow-down"></i> Traer de Drive
+                    </button>
+                </div>
+                <p id="drive-last-sync" class="text-[10px] text-slate-400 text-center hidden"></p>
+            </div>
+
+            <!-- Importar / Exportar Historial (Migración desde Gemini + CSV) -->
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-2.5">
+                <span class="text-xs font-bold text-white block">Importar / Exportar Historial</span>
+                <p class="text-[11px] text-slate-400 leading-snug">
+                    Cargá tu historial anterior (JSON exportado desde Gemini) o descargá tus entrenamientos en CSV para abrir en Google Sheets / Excel.
+                </p>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="py-2.5 px-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+                        <i class="ph-bold ph-upload-simple"></i> Importar JSON
+                        <input id="import-json-file" type="file" accept=".json,application/json,text/plain" onchange="handleImportFile(event)" class="hidden">
+                    </label>
+                    <button onclick="togglePasteImportBox()" class="py-2.5 px-2 rounded-xl bg-slate-700/80 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95">
+                        <i class="ph-bold ph-clipboard-text"></i> Pegar JSON
+                    </button>
+                </div>
+
+                <!-- Caja opcional para pegar JSON directamente -->
+                <div id="paste-import-box" class="hidden space-y-2 pt-1">
+                    <textarea id="paste-json-textarea" rows="4" placeholder='Pegá acá el texto JSON de tu historial anterior...' class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+                    <button onclick="handleImportPastedJson()" class="w-full py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                        Cargar Historial Pegado
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/70">
+                    <button onclick="downloadBackupJSON()" class="py-2 rounded-xl bg-slate-900 hover:bg-slate-950 border border-slate-700 text-slate-300 font-semibold text-[11px] flex items-center justify-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-file-code"></i> Backup JSON
+                    </button>
+                    <button onclick="downloadMetricsCSV()" class="py-2 rounded-xl bg-slate-900 hover:bg-slate-950 border border-slate-700 text-emerald-300 font-semibold text-[11px] flex items-center justify-center gap-1 active:scale-95">
+                        <i class="ph-bold ph-table"></i> Descargar CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: AGREGAR EJERCICIO PERSONALIZADO     -->
+    <!-- ========================================== -->
+    <div id="modal-add-exercise" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-white">Nuevo Ejercicio</h3>
+                <button onclick="closeAddExerciseModal()" class="text-slate-400 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold block mb-1">Nombre del Ejercicio</label>
+                    <input id="custom-ex-name" type="text" placeholder="Ej: Encogimientos con mancuernas" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Rango Reps</label>
+                        <input id="custom-ex-reps" type="text" value="10-12 reps" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-semibold block mb-1">Tipo Descanso</label>
+                        <select id="custom-ex-type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                            <option value="compound">Compuesto (150s)</option>
+                            <option value="isolation" selected>Analítico (90s)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeAddExerciseModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
+                <button onclick="confirmAddCustomExercise()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-extrabold">Agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CELEBRACIÓN FIN DE ENTRENAMIENTO    -->
+    <!-- ========================================== -->
+    <div id="modal-celebration" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                <i class="ph-fill ph-trophy text-4xl"></i>
+            </div>
+            <div>
+                <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-bold">¡Sesión Guardada!</span>
+                <h3 id="celebration-title" class="text-xl font-extrabold text-white mt-1">Entrenamiento Completado</h3>
+                <p id="celebration-subtitle" class="text-xs text-slate-400 mt-1">Los pesos quedaron grabados como referencia fantasma para la semana que viene.</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 grid grid-cols-2 gap-2">
+                <div>
+                    <span class="text-[10px] uppercase text-slate-400 block">Volumen Movido</span>
+                    <span id="celebration-volume" class="font-mono text-lg font-extrabold text-emerald-400">0 kg</span>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase text-slate-400 block">Series Completadas</span>
+                    <span id="celebration-sets" class="font-mono text-lg font-extrabold text-white">0</span>
+                </div>
+            </div>
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left flex items-center gap-2.5">
+                <i class="ph-fill ph-jar text-amber-400 text-2xl shrink-0"></i>
+                <p class="text-[11px] text-amber-200 leading-tight">
+                    <strong>Recordatorio Post-Entreno:</strong> Tomá tus 45-50g de Soja HSN + 60g Evocarbs y marcalo en la pestaña Combustible.
+                </p>
+            </div>
+            <button onclick="closeCelebrationModal()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-sm">
+                Ir a Marcar mi Batido HSN
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CONFIRMAR RESET                     -->
+    <!-- ========================================== -->
+    <div id="modal-reset" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xs w-full p-5 text-center space-y-4">
+            <i class="ph-fill ph-warning-circle text-3xl text-rose-400"></i>
+            <h3 class="font-bold text-base text-white">¿Reiniciar historial?</h3>
+            <p class="text-xs text-slate-400">Se restaurarán los pesos sugeridos iniciales para 75 kg y se borrarán las sesiones pasadas.</p>
+            <div class="flex gap-2">
+                <button onclick="closeResetConfirmModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancelar</button>
+                <button onclick="confirmResetAllData()" class="flex-1 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TOAST DE NOTIFICACIÓN                      -->
+    <!-- ========================================== -->
+    <div id="toast-notification" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-emerald-500/50 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-3 whitespace-nowrap">
+        <i class="ph-fill ph-check-circle text-emerald-400 text-base"></i>
+        <span id="toast-text">Guardado</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- NAVEGACIÓN INFERIOR (BOTTOM BAR)           -->
+    <!-- ========================================== -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800">
+        <div class="max-w-md mx-auto grid grid-cols-4 px-2 py-1.5">
+            <button onclick="switchTab('entrenar')" id="nav-entrenar" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 transition">
+                <i class="ph-fill ph-barbell text-xl"></i>
+                <span class="text-[11px] font-bold mt-0.5">Entrenar</span>
+            </button>
+            <button onclick="switchTab('combustible')" id="nav-combustible" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="ph-fill ph-fire text-xl"></i>
+                <span class="text-[11px] font-medium mt-0.5">Combustible</span>
+            </button>
+            <button onclick="switchTab('historial')" id="nav-historial" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="ph-fill ph-chart-line-up text-xl"></i>
+                <span class="text-[11px] font-medium mt-0.5">Métricas</span>
+            </button>
+            <button onclick="switchTab('calendario')" id="nav-calendario" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="ph-fill ph-calendar-blank text-xl"></i>
+                <span class="text-[11px] font-medium mt-0.5">Calendario</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- LÓGICA DE LA APLICACIÓN + GOOGLE DRIVE     -->
+    <!-- ========================================== -->
+    <script>
+        // ----------------------------------------------------
+        // 0. CONFIGURACIÓN OPCIONAL DE GOOGLE OAUTH CLIENT ID
+        // (Si pegás tu Client ID acá, cualquiera que abra este .html
+        //  podrá tocar "Conectar con Google Drive" sin configurarlo)
+        // ----------------------------------------------------
+        const DEFAULT_GOOGLE_CLIENT_ID = '';
+
+        const STORAGE_KEY = 'hyperhoops_app_state_v2';
+        const CLIENT_ID_STORAGE_KEY = 'hyperhoops_google_client_id';
+        const DRIVE_FOLDER_NAME = 'HyperHoops_Gym';
+        const DRIVE_JSON_FILENAME = 'hyperhoops_data.json';
+        const DRIVE_CSV_FILENAME = 'hyperhoops_metricas.csv';
+        const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+
+        // Generar manifest PWA dinámico en un solo archivo
+        (function injectInlineManifest() {
+            try {
+                const manifest = {
+                    name: 'HyperHoops | Hipertrofia + Básquet',
+                    short_name: 'HyperHoops',
+                    start_url: '.',
+                    display: 'standalone',
+                    background_color: '#0f172a',
+                    theme_color: '#0f172a',
+                    orientation: 'portrait',
+                    icons: [
+                        {
+                            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f172a'/%3E%3Crect x='10' y='10' width='172' height='172' rx='36' fill='none' stroke='%2310b981' stroke-width='10'/%3E%3Ctext x='96' y='125' font-size='86' text-anchor='middle' fill='%2310b981' font-family='sans-serif' font-weight='900'%3EHH%3C/text%3E%3C/svg%3E",
+                            sizes: '192x192',
+                            type: 'image/svg+xml'
+                        }
+                    ]
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = URL.createObjectURL(blob);
+                document.head.appendChild(link);
+            } catch (e) {}
+        })();
+
+        // ----------------------------------------------------
+        // 1. BASE DE DATOS DE RUTINA INICIAL (75kg / 1.85m)
+        // ----------------------------------------------------
+        const INITIAL_ROUTINE = {
+            day1: {
+                id: 'day1',
+                shortName: 'Día 1: Empuje/Cuád',
+                title: 'Día 1: Énfasis Empuje + Cuádriceps',
+                subtitle: 'Básicos RIR 1-2 (150s) • Analíticos RIR 0 última serie (90s)',
+                exercises: [
+                    {
+                        id: 'd1_ex1',
+                        variants: ['Sentadilla Libre', 'Hack Squat', 'Prensa 45°'],
+                        selectedVariant: 0,
+                        targetReps: '6-8 reps',
+                        type: 'compound',
+                        defaultWeight: 70,
+                        defaultReps: 8,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd1_ex2',
+                        variants: ['Press Banca Plano Barra', 'Press Plano Mancuernas'],
+                        selectedVariant: 0,
+                        targetReps: '6-8 reps',
+                        type: 'compound',
+                        defaultWeight: 60,
+                        defaultReps: 8,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd1_ex3',
+                        variants: ['Remo Polea Baja Neutro', 'Remo con Barra', 'Remo en Máquina'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 55,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd1_ex4',
+                        variants: ['Press Militar Mancuernas', 'Press Hombros Máquina'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 18,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd1_ex5',
+                        variants: ['Curl Femoral Tumbado', 'Curl Femoral Sentado'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'isolation',
+                        defaultWeight: 40,
+                        defaultReps: 12,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd1_ex6',
+                        variants: ['Tríceps en Polea con Soga', 'Tríceps Barra Recta'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 22.5,
+                        defaultReps: 12,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    }
+                ]
+            },
+            day2: {
+                id: 'day2',
+                shortName: 'Día 2: Tracción/Isquios',
+                title: 'Día 2: Énfasis Tracción + Bisagra Cadera',
+                subtitle: 'Controlá la bajada en el Peso Muerto Rumano • RIR 1-2',
+                exercises: [
+                    {
+                        id: 'd2_ex1',
+                        variants: ['Peso Muerto Rumano Barra', 'Peso Muerto Rumano Mancuernas'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 75,
+                        defaultReps: 8,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd2_ex2',
+                        variants: ['Jalón al Pecho Prono', 'Dominadas Libres / Lastradas'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 60,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd2_ex3',
+                        variants: ['Press Inclinado Mancuernas 30°', 'Press Inclinado Multipower'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 22.5,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd2_ex4',
+                        variants: ['Sillón de Cuádriceps (Extensiones)'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 50,
+                        defaultReps: 14,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd2_ex5',
+                        variants: ['Elevaciones Laterales Mancuernas', 'Elevaciones Laterales Polea'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 10,
+                        defaultReps: 14,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd2_ex6',
+                        variants: ['Curl Bíceps Barra Z', 'Curl Mancuernas Banco Inclinado'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'isolation',
+                        defaultWeight: 27.5,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    }
+                ]
+            },
+            day3: {
+                id: 'day3',
+                shortName: 'Día 3: Full Body',
+                title: 'Día 3: Full Body Híbrido',
+                subtitle: 'Ideal para los viernes post-partido de básquet del jueves',
+                exercises: [
+                    {
+                        id: 'd3_ex1',
+                        variants: ['Prensa de Piernas 45°', 'Sentadilla Búlgara Mancuernas'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 130,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex2',
+                        variants: ['Fondos en Paralelas', 'Press Máquina Convergente'],
+                        selectedVariant: 0,
+                        targetReps: '8-10 reps',
+                        type: 'compound',
+                        defaultWeight: 75,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex3',
+                        variants: ['Remo a 1 Brazo con Mancuerna', 'Remo en Punta (T-Bar)'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'compound',
+                        defaultWeight: 26,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex4',
+                        variants: ['Hip Thrust con Barra', 'Curl Femoral Sentado'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'compound',
+                        defaultWeight: 85,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex5',
+                        variants: ['Face Pull en Polea Alta', 'Pájaros en Máquina (Deltoides Post.)'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 25,
+                        defaultReps: 15,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex6',
+                        variants: ['Superserie: Martillo + Ext. Tras Nuca', 'Superserie: Martillo + Press Francés'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'isolation',
+                        defaultWeight: 14,
+                        defaultReps: 12,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd3_ex7',
+                        variants: ['Gemelos de Pie en Máquina', 'Gemelos Sentado'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 60,
+                        defaultReps: 15,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    }
+                ]
+            },
+            day4: {
+                id: 'day4',
+                shortName: 'Día 4: Torso/Brazos',
+                title: 'Día 4 (Opcional): Torso + Brazos + Estética',
+                subtitle: 'Sin fatiga de piernas • No interfiere con el básquet',
+                exercises: [
+                    {
+                        id: 'd4_ex1',
+                        variants: ['Cruces en Polea Alta', 'Aperturas en Pec Deck'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 20,
+                        defaultReps: 14,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd4_ex2',
+                        variants: ['Jalón Agarre Estrecho Neutro', 'Jalón Supino'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'compound',
+                        defaultWeight: 55,
+                        defaultReps: 10,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd4_ex3',
+                        variants: ['Elevaciones Laterales en Polea', 'Elevaciones Laterales Mancuernas'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 7.5,
+                        defaultReps: 15,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd4_ex4',
+                        variants: ['Curl Bíceps Banco Scott', 'Spider Curl con Mancuernas'],
+                        selectedVariant: 0,
+                        targetReps: '10-12 reps',
+                        type: 'isolation',
+                        defaultWeight: 25,
+                        defaultReps: 12,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd4_ex5',
+                        variants: ['Tríceps Unilateral en Polea', 'Fondos entre Bancos'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 10,
+                        defaultReps: 14,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    },
+                    {
+                        id: 'd4_ex6',
+                        variants: ['Crunch Abdominal en Polea Alta', 'Elevaciones de Piernas Colgado'],
+                        selectedVariant: 0,
+                        targetReps: '12-15 reps',
+                        type: 'isolation',
+                        defaultWeight: 35,
+                        defaultReps: 15,
+                        sets: [
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 1, done: false },
+                            { weight: '', reps: '', rir: 0, done: false }
+                        ]
+                    }
+                ]
+            },
+            basket: {
+                id: 'basket',
+                shortName: '🏀 Partido Básquet',
+                title: 'Partido / Entreno de Básquet',
+                subtitle: 'Sube automáticamente tu meta de hoy a 3.400 kcal',
+                isBasket: true
+            }
+        };
+
+        const QUICK_MEAL_IDEAS = [
+            "⚡ Opción Batido Denso (420 kcal | 24g prot): 1/2 scoop extra de Proteína de Soja HSN (25g) + 1 cda sopera colmada de crema de cacahuete + 1 banana + agua o bebida vegetal.",
+            "🥜 Opción Crunch Sin Cocinar (450 kcal | 18g prot): 1 puñado grande de pistachos o nueces (50g) + 1 yogur alto en proteínas o vaso de bebida de soja + 40g de avena.",
+            "🍞 Opción Tostada Rápida (410 kcal | 20g prot): 2 rebanadas de pan integral + 2 cdas generosas de crema de cacahuete (maní) + semillas de chía por encima.",
+            "🫒 Opción Salada Express (390 kcal | 22g prot): 1 lata de atún o bloque de tofu firme desmenuzado + 1 chorro generoso de aceite de oliva virgen extra + 4 tostadas de arroz."
+        ];
+
+        function getTodayDateKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        // ----------------------------------------------------
+        // 2. ESTADO DE LA APLICACIÓN (LOCALSTORAGE + GOOGLE DRIVE)
+        // ----------------------------------------------------
+        let appState = {
+            currentTab: 'entrenar',
+            selectedDayId: 'day1',
+            weekMode: 'standard',
+            routine: JSON.parse(JSON.stringify(INITIAL_ROUTINE)),
+            ghostHistory: {},
+            workoutLogs: [],
+            weightHistory: [{ date: 'Inicio', weight: 75.0 }],
+            dailyNutrition: {
+                dateKey: getTodayDateKey(),
+                meal1: false,
+                meal2: false,
+                meal3: false,
+                hsnShake: false,
+                meal4: false,
+                isBasketDay: false
+            },
+            basketSessionIntensity: 'Partido Oficial / Intenso',
+            basketDuration: 60,
+            ideaIndex: 0
+        };
+
+        function serializePersistableState() {
+            return {
+                weekMode: appState.weekMode,
+                ghostHistory: appState.ghostHistory,
+                workoutLogs: appState.workoutLogs,
+                weightHistory: appState.weightHistory,
+                dailyNutrition: appState.dailyNutrition,
+                routine: appState.routine,
+                updatedAt: Date.now()
+            };
+        }
+
+        function loadLocalState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                mergeLoadedState(parsed);
+            } catch (e) {
+                console.warn('Error leyendo localStorage:', e);
+            }
+        }
+
+        function mergeLoadedState(loaded) {
+            if (!loaded || typeof loaded !== 'object') return;
+            // Si viene envuelto en { serializedState: "..." } (formato directo de Firestore)
+            if (typeof loaded.serializedState === 'string') {
+                loaded = JSON.parse(loaded.serializedState);
+            }
+            if (loaded.weekMode) appState.weekMode = loaded.weekMode;
+            if (loaded.ghostHistory && typeof loaded.ghostHistory === 'object') {
+                appState.ghostHistory = loaded.ghostHistory;
+            }
+            if (Array.isArray(loaded.workoutLogs)) {
+                appState.workoutLogs = loaded.workoutLogs;
+            }
+            if (Array.isArray(loaded.weightHistory) && loaded.weightHistory.length) {
+                appState.weightHistory = loaded.weightHistory;
+            }
+            if (loaded.dailyNutrition && loaded.dailyNutrition.dateKey === getTodayDateKey()) {
+                appState.dailyNutrition = loaded.dailyNutrition;
+            }
+            if (loaded.routine && loaded.routine.day1) {
+                appState.routine = loaded.routine;
+            }
+        }
+
+        let driveSyncTimeout = null;
+        function saveAppState(immediateDriveSync = false) {
+            updateHeaderStats();
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePersistableState()));
+            } catch (e) {
+                console.error('Error guardando localStorage:', e);
+            }
+
+            if (driveAccessToken) {
+                clearTimeout(driveSyncTimeout);
+                if (immediateDriveSync) {
+                    syncToGoogleDrive(false);
+                } else {
+                    driveSyncTimeout = setTimeout(() => syncToGoogleDrive(false), 1800);
+                }
+            }
+        }
+
+        // ----------------------------------------------------
+        // 2B. GOOGLE DRIVE OAUTH 2.0 (GOOGLE IDENTITY SERVICES)
+        // ----------------------------------------------------
+        let driveAccessToken = null;
+        let driveTokenClient = null;
+        let driveFolderId = null;
+
+        function getSavedClientId() {
+            return (localStorage.getItem(CLIENT_ID_STORAGE_KEY) || DEFAULT_GOOGLE_CLIENT_ID || '').trim();
+        }
+
+        function setSyncBadge(state, text) {
+            const dot = document.getElementById('sync-dot');
+            const label = document.getElementById('sync-label');
+            const pill = document.getElementById('drive-status-pill');
+            if (!dot || !label) return;
+
+            label.textContent = text;
+            if (state === 'connected') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+                if (pill) {
+                    pill.textContent = 'Conectado';
+                    pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                }
+            } else if (state === 'syncing') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+                if (pill) {
+                    pill.textContent = 'Sincronizando...';
+                    pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                }
+            } else if (state === 'error') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400';
+                if (pill) {
+                    pill.textContent = 'Error Sync';
+                    pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                }
+            } else {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+                if (pill) {
+                    pill.textContent = 'Desconectado';
+                    pill.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700';
+                }
+            }
+        }
+
+        function updateDriveModalUI() {
+            const isFileProto = window.location.protocol === 'file:';
+            document.getElementById('drive-file-warning').classList.toggle('hidden', !isFileProto);
+
+            const input = document.getElementById('google-client-id-input');
+            if (input && !input.value) {
+                input.value = getSavedClientId();
+            }
+
+            const connected = !!driveAccessToken;
+            document.getElementById('btn-sync-up').classList.toggle('hidden', !connected);
+            document.getElementById('btn-sync-down').classList.toggle('hidden', !connected);
+            document.getElementById('btn-connect-drive-text').textContent = connected
+                ? 'Reconectar / Cambiar Cuenta Google'
+                : 'Conectar con Google Drive';
+        }
+
+        function openDriveModal() {
+            updateDriveModalUI();
+            const m = document.getElementById('modal-drive');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeDriveModal() {
+            const m = document.getElementById('modal-drive');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function connectGoogleDrive() {
+            if (window.location.protocol === 'file:') {
+                showToast('Abrí el HTML desde https:// (GitHub Pages/Netlify) para usar Google Drive');
+                return;
+            }
+            const inputVal = document.getElementById('google-client-id-input').value.trim();
+            if (!inputVal) {
+                showToast('Pegá tu Google OAuth Client ID primero');
+                return;
+            }
+            localStorage.setItem(CLIENT_ID_STORAGE_KEY, inputVal);
+
+            if (!window.google || !google.accounts || !google.accounts.oauth2) {
+                showToast('Cargando librería de Google... intentá de nuevo en 2s');
+                return;
+            }
+
+            driveTokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: inputVal,
+                scope: DRIVE_SCOPE,
+                callback: async (tokenResponse) => {
+                    if (tokenResponse.error) {
+                        console.error('OAuth error:', tokenResponse);
+                        setSyncBadge('error', 'Error Auth');
+                        showToast('Error al iniciar sesión con Google');
+                        return;
+                    }
+                    driveAccessToken = tokenResponse.access_token;
+                    setSyncBadge('connected', 'Drive OK');
+                    updateDriveModalUI();
+                    showToast('Google Drive conectado');
+
+                    // Intentar traer datos existentes de Drive si hay pocos datos locales, o sincronizar
+                    await loadFromGoogleDrive(false);
+                    await syncToGoogleDrive(false);
+                }
+            });
+
+            driveTokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+
+        async function driveApiFetch(url, options = {}) {
+            const headers = Object.assign({ Authorization: `Bearer ${driveAccessToken}` }, options.headers || {});
+            const res = await fetch(url, { ...options, headers });
+            if (res.status === 401) {
+                driveAccessToken = null;
+                setSyncBadge('local', 'Local');
+                updateDriveModalUI();
+                throw new Error('Token expirado. Volvé a conectar Google Drive.');
+            }
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(`Drive API ${res.status}: ${txt}`);
+            }
+            return res;
+        }
+
+        async function ensureDriveFolder() {
+            if (driveFolderId) return driveFolderId;
+            const q = encodeURIComponent(`name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+            const res = await driveApiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
+            const data = await res.json();
+            if (data.files && data.files.length > 0) {
+                driveFolderId = data.files[0].id;
+                return driveFolderId;
+            }
+            const createRes = await driveApiFetch('https://www.googleapis.com/drive/v3/files', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: DRIVE_FOLDER_NAME,
+                    mimeType: 'application/vnd.google-apps.folder'
+                })
+            });
+            const created = await createRes.json();
+            driveFolderId = created.id;
+            return driveFolderId;
+        }
+
+        async function findDriveFile(fileName, folderId) {
+            const q = encodeURIComponent(`name='${fileName}' and '${folderId}' in parents and trashed=false`);
+            const res = await driveApiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)`);
+            const data = await res.json();
+            return (data.files && data.files.length > 0) ? data.files[0] : null;
+        }
+
+        async function upsertDriveFile(fileName, content, mimeType, folderId) {
+            const existing = await findDriveFile(fileName, folderId);
+            const boundary = 'hyperhoops_boundary_' + Date.now();
+            const metadata = existing
+                ? { name: fileName, mimeType }
+                : { name: fileName, mimeType, parents: [folderId] };
+
+            const body =
+                `--${boundary}\r\n` +
+                `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+                `${JSON.stringify(metadata)}\r\n` +
+                `--${boundary}\r\n` +
+                `Content-Type: ${mimeType}; charset=UTF-8\r\n\r\n` +
+                `${content}\r\n` +
+                `--${boundary}--`;
+
+            const url = existing
+                ? `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=multipart`
+                : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+
+            await driveApiFetch(url, {
+                method: existing ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
+                body
+            });
+        }
+
+        async function syncToGoogleDrive(showFeedback = true) {
+            if (!driveAccessToken) {
+                if (showFeedback) showToast('Conectá Google Drive primero');
+                return;
+            }
+            try {
+                setSyncBadge('syncing', 'Subiendo...');
+                const folderId = await ensureDriveFolder();
+                const jsonContent = JSON.stringify(serializePersistableState(), null, 2);
+                const csvContent = buildMetricsCSV();
+
+                await upsertDriveFile(DRIVE_JSON_FILENAME, jsonContent, 'application/json', folderId);
+                await upsertDriveFile(DRIVE_CSV_FILENAME, csvContent, 'text/csv', folderId);
+
+                const nowStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                const lastSyncEl = document.getElementById('drive-last-sync');
+                if (lastSyncEl) {
+                    lastSyncEl.textContent = `Última sincronización en Drive/${DRIVE_FOLDER_NAME}: ${nowStr}`;
+                    lastSyncEl.classList.remove('hidden');
+                }
+                setSyncBadge('connected', 'Drive OK');
+                if (showFeedback) showToast('JSON y CSV actualizados en Google Drive');
+            } catch (err) {
+                console.error('Error subiendo a Drive:', err);
+                setSyncBadge('error', 'Error Drive');
+                if (showFeedback) showToast('Error subiendo a Drive: ' + err.message);
+            }
+        }
+
+        async function syncNowToDrive() {
+            await syncToGoogleDrive(true);
+        }
+
+        async function loadFromGoogleDrive(forceOverwrite = false) {
+            if (!driveAccessToken) return;
+            try {
+                setSyncBadge('syncing', 'Leyendo...');
+                const folderId = await ensureDriveFolder();
+                const file = await findDriveFile(DRIVE_JSON_FILENAME, folderId);
+                if (!file) {
+                    setSyncBadge('connected', 'Drive OK');
+                    if (forceOverwrite) showToast('Todavía no hay archivo en Drive; tocá "Subir a Drive"');
+                    return;
+                }
+                const res = await driveApiFetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`);
+                const remoteData = await res.json();
+
+                const localLogsCount = appState.workoutLogs.length;
+                const remoteLogsCount = (remoteData.workoutLogs || []).length;
+
+                if (forceOverwrite || (localLogsCount === 0 && remoteLogsCount > 0)) {
+                    mergeLoadedState(remoteData);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePersistableState()));
+                    renderAll();
+                    showToast(`Historial cargado desde Drive (${remoteLogsCount} sesiones)`);
+                }
+                setSyncBadge('connected', 'Drive OK');
+            } catch (err) {
+                console.error('Error leyendo Drive:', err);
+                setSyncBadge('error', 'Error Drive');
+                if (forceOverwrite) showToast('Error leyendo Drive');
+            }
+        }
+
+        // ----------------------------------------------------
+        // 2C. IMPORTAR / EXPORTAR JSON Y CSV
+        // ----------------------------------------------------
+        function togglePasteImportBox() {
+            document.getElementById('paste-import-box').classList.toggle('hidden');
+        }
+
+        function applyImportedJsonString(text) {
+            try {
+                const parsed = JSON.parse(text.trim());
+                mergeLoadedState(parsed);
+                saveAppState(true);
+                renderAll();
+                closeDriveModal();
+                showToast(`¡Historial importado! (${appState.workoutLogs.length} sesiones)`);
+            } catch (e) {
+                console.error(e);
+                showToast('El texto no es un JSON válido');
+            }
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => applyImportedJsonString(e.target.result);
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function handleImportPastedJson() {
+            const val = document.getElementById('paste-json-textarea').value;
+            if (!val.trim()) return;
+            applyImportedJsonString(val);
+            document.getElementById('paste-json-textarea').value = '';
+            document.getElementById('paste-import-box').classList.add('hidden');
+        }
+
+        function downloadFile(filename, content, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadBackupJSON() {
+            const json = JSON.stringify(serializePersistableState(), null, 2);
+            downloadFile(`hyperhoops_backup_${getTodayDateKey()}.json`, json, 'application/json');
+            showToast('Backup JSON descargado');
+        }
+
+        function calcEpley1RM(weight, reps) {
+            const w = parseFloat(weight) || 0;
+            const r = parseInt(reps) || 0;
+            if (w <= 0 || r <= 0) return 0;
+            if (r === 1) return Math.round(w * 10) / 10;
+            return Math.round(w * (1 + r / 30) * 10) / 10;
+        }
+
+        // Extrae datos estructurados de ejercicios tanto de logs nuevos como importados de Gemini
+        function extractExerciseMetricsFromLog(log) {
+            if (Array.isArray(log.exercises) && log.exercises.length > 0) {
+                return log.exercises;
+            }
+            const parsed = [];
+            (log.details || []).forEach(line => {
+                // Formato original: "Sentadilla Libre: 3x (70kg × 8)"
+                const m = String(line).match(/^(.+?):\s*(\d+)x\s*\(([\d.]+)\s*kg\s*[×x]\s*(\d+)\)/i);
+                if (m) {
+                    const name = m[1].trim();
+                    const setsCount = parseInt(m[2]) || 1;
+                    const bestWeight = parseFloat(m[3]) || 0;
+                    const bestReps = parseInt(m[4]) || 0;
+                    parsed.push({
+                        name,
+                        setsCount,
+                        bestWeight,
+                        bestReps,
+                        est1RM: calcEpley1RM(bestWeight, bestReps),
+                        volume: bestWeight * bestReps * setsCount
+                    });
+                }
+            });
+            return parsed;
+        }
+
+        function buildMetricsCSV() {
+            const header = ['Fecha', 'Dia', 'Ejercicio', 'Series', 'Peso_Max_kg', 'Reps_Mejor_Serie', 'Volumen_Ejercicio_kg', '1RM_Estimado_kg', 'Volumen_Sesion_kg'];
+            const rows = [header.join(',')];
+            const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
+            // Orden cronológico (más antiguo primero) para graficar directo en Google Sheets
+            const chronological = [...appState.workoutLogs].reverse();
+            chronological.forEach(log => {
+                const exList = extractExerciseMetricsFromLog(log);
+                if (exList.length === 0) {
+                    rows.push([
+                        esc(log.date),
+                        esc(log.title),
+                        esc(log.title),
+                        esc(log.setsCount || ''),
+                        0,
+                        0,
+                        0,
+                        0,
+                        log.volume || 0
+                    ].join(','));
+                } else {
+                    exList.forEach(ex => {
+                        rows.push([
+                            esc(log.date),
+                            esc(log.title),
+                            esc(ex.name),
+                            ex.setsCount || (ex.sets ? ex.sets.length : 0),
+                            ex.bestWeight || 0,
+                            ex.bestReps || 0,
+                            Math.round((ex.volume || 0) * 10) / 10,
+                            ex.est1RM || calcEpley1RM(ex.bestWeight, ex.bestReps),
+                            log.volume || 0
+                        ].join(','));
+                    });
+                }
+            });
+            return '\uFEFF' + rows.join('\n');
+        }
+
+        function downloadMetricsCSV() {
+            const csv = buildMetricsCSV();
+            downloadFile(`hyperhoops_metricas_${getTodayDateKey()}.csv`, csv, 'text/csv;charset=utf-8;');
+            showToast('CSV de métricas descargado');
+        }
+
+        // ----------------------------------------------------
+        // 3. RENDERIZADO DE PESTAÑA "ENTRENAR"
+        // ----------------------------------------------------
+        function renderDaySelector() {
+            const container = document.getElementById('day-selector-container');
+            const days = ['day1', 'day2', 'day3', 'day4', 'basket'];
+            container.innerHTML = days.map(dKey => {
+                const dObj = appState.routine[dKey];
+                const isSelected = appState.selectedDayId === dKey;
+                const activeClasses = isSelected
+                    ? 'bg-emerald-500 text-slate-950 font-extrabold border-emerald-400 shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-800/90 text-slate-300 font-semibold border-slate-700 hover:bg-slate-800';
+                return `
+                    <button onclick="selectWorkoutDay('${dKey}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs border transition active:scale-95 ${activeClasses}">
+                        ${dObj.shortName}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function getGhostForVariant(ex, variantName) {
+            if (appState.ghostHistory[variantName]) {
+                return appState.ghostHistory[variantName];
+            }
+            return {
+                weight: ex.defaultWeight,
+                reps: ex.defaultReps,
+                allRir2Plus: false,
+                isInitialSuggestion: true
+            };
+        }
+
+        function renderExercisesList() {
+            const dayObj = appState.routine[appState.selectedDayId];
+            document.getElementById('day-title').textContent = dayObj.title;
+            document.getElementById('day-subtitle').textContent = dayObj.subtitle;
+
+            const listContainer = document.getElementById('exercises-list');
+            const addWrapper = document.getElementById('add-exercise-wrapper');
+            const finishBtnText = document.getElementById('finish-btn-text');
+
+            if (dayObj.isBasket) {
+                addWrapper.classList.add('hidden');
+                finishBtnText.textContent = 'REGISTRAR PARTIDO DE BÁSQUET (+3400 KCAL)';
+                document.getElementById('current-session-volume').textContent = 'Cardio Alta Int.';
+                listContainer.innerHTML = `
+                    <div class="bg-slate-800/80 border border-amber-500/40 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center">
+                                <i class="ph-fill ph-basketball text-3xl"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Gasto Calórico Elevado</span>
+                                <h3 class="text-base font-extrabold text-white">Sesión de Básquet</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Para no perder masa muscular jugando al básquet con tus 1.85m, hoy tu meta calórica sube automáticamente a <strong>3.400 kcal</strong> y te conviene tomar tu batido de <strong>Soja HSN + 60g Evocarbs</strong> apenas termines el partido.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label class="text-[11px] text-slate-400 font-semibold block mb-1">Duración (min)</label>
+                                <input type="number" value="${appState.basketDuration}" onchange="updateBasketDuration(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 font-mono text-sm font-bold text-white">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-400 font-semibold block mb-1">Exigencia</label>
+                                <select onchange="updateBasketIntensity(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-white">
+                                    <option value="Partido Oficial / Intenso">Partido Intenso</option>
+                                    <option value="Pachanga / Amigos">Partido Amigos</option>
+                                    <option value="Entrenamiento Técnico">Tiro / Técnico</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            addWrapper.classList.remove('hidden');
+            finishBtnText.textContent = 'FINALIZAR Y GUARDAR ENTRENAMIENTO';
+
+            let totalVolume = 0;
+
+            listContainer.innerHTML = dayObj.exercises.map((ex, exIdx) => {
+                const currentVariantName = ex.variants[ex.selectedVariant] || ex.variants[0];
+                const ghost = getGhostForVariant(ex, currentVariantName);
+
+                ex.sets.forEach(s => {
+                    if (s.done) {
+                        const w = parseFloat(s.weight) || 0;
+                        const r = parseInt(s.reps) || 0;
+                        totalVolume += (w * r);
+                    }
+                });
+
+                const overloadBadge = ghost.allRir2Plus
+                    ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold flex items-center gap-1">
+                        <i class="ph-bold ph-trend-up"></i> ¡Subir a ${ghost.weight + 2.5}kg!
+                       </span>`
+                    : '';
+
+                const ghostLabel = ghost.isInitialSuggestion
+                    ? `Sugerido (75kg): <strong class="text-slate-200 font-mono">${ghost.weight}kg × ${ghost.reps}</strong>`
+                    : `Última vez: <strong class="text-emerald-400 font-mono">${ghost.weight}kg × ${ghost.reps}</strong>`;
+
+                return `
+                <div class="bg-slate-800/75 border border-slate-700/80 rounded-2xl p-3.5 space-y-3 shadow-sm">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-emerald-400 border border-slate-700">${ex.targetReps}</span>
+                                <span class="text-[10px] font-mono text-slate-400">${ex.type === 'compound' ? '⏱ 150s' : '⏱ 90s'}</span>
+                                ${overloadBadge}
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <h3 class="font-extrabold text-sm text-white leading-snug">${currentVariantName}</h3>
+                                ${ex.variants.length > 1 ? `
+                                    <button onclick="cycleExerciseVariant(${exIdx})" title="Cambiar variante de máquina/ejercicio" class="px-2 py-0.5 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-[10px] font-semibold text-emerald-300 flex items-center gap-1 shrink-0 active:scale-95">
+                                        <i class="ph-bold ph-arrows-left-right"></i> Variante
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="text-right bg-slate-900/90 border border-slate-800 px-2.5 py-1.5 rounded-xl shrink-0">
+                            <div class="text-[10px] text-slate-400 flex items-center justify-end gap-1">
+                                <i class="ph-fill ph-ghost text-slate-400"></i> ${ghostLabel}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-1.5 text-[10px] uppercase tracking-wider font-bold text-slate-400 px-1">
+                        <div class="col-span-1 text-center">#</div>
+                        <div class="col-span-4 text-center">Peso (kg)</div>
+                        <div class="col-span-3 text-center">Reps</div>
+                        <div class="col-span-2 text-center">RIR</div>
+                        <div class="col-span-2 text-center">Listo</div>
+                    </div>
+
+                    <div class="space-y-2">
+                        ${ex.sets.map((setObj, setIdx) => {
+                            const rowDoneClass = setObj.done
+                                ? 'bg-emerald-950/35 border-emerald-500/40'
+                                : 'bg-slate-900/70 border-slate-800';
+
+                            let rirBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+                            let rirText = 'RIR 1';
+                            if (setObj.rir === 2) {
+                                rirBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+                                rirText = 'RIR 2+';
+                            } else if (setObj.rir === 0) {
+                                rirBadgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+                                rirText = 'Fallo';
+                            }
+
+                            const checkBtnClass = setObj.done
+                                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-500/20'
+                                : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white';
+
+                            return `
+                            <div class="grid grid-cols-12 gap-1.5 items-center p-1.5 rounded-xl border transition ${rowDoneClass}">
+                                <div class="col-span-1 text-center font-mono text-xs font-bold text-slate-400">
+                                    ${setIdx + 1}
+                                </div>
+
+                                <div class="col-span-4 flex items-center bg-slate-950/80 rounded-lg border border-slate-800 overflow-hidden">
+                                    <button onclick="stepSetValue(${exIdx}, ${setIdx}, 'weight', -2.5)" class="px-1.5 py-1.5 text-slate-400 hover:text-white active:bg-slate-800 text-xs font-bold">-</button>
+                                    <input type="number" step="0.5"
+                                        placeholder="${ghost.weight}"
+                                        value="${setObj.weight}"
+                                        onchange="updateSetInput(${exIdx}, ${setIdx}, 'weight', this.value)"
+                                        class="w-full bg-transparent text-center font-mono text-xs font-bold text-white focus:outline-none">
+                                    <button onclick="stepSetValue(${exIdx}, ${setIdx}, 'weight', 2.5)" class="px-1.5 py-1.5 text-slate-400 hover:text-white active:bg-slate-800 text-xs font-bold">+</button>
+                                </div>
+
+                                <div class="col-span-3 flex items-center bg-slate-950/80 rounded-lg border border-slate-800 overflow-hidden">
+                                    <button onclick="stepSetValue(${exIdx}, ${setIdx}, 'reps', -1)" class="px-1.5 py-1.5 text-slate-400 hover:text-white active:bg-slate-800 text-xs font-bold">-</button>
+                                    <input type="number"
+                                        placeholder="${ghost.reps}"
+                                        value="${setObj.reps}"
+                                        onchange="updateSetInput(${exIdx}, ${setIdx}, 'reps', this.value)"
+                                        class="w-full bg-transparent text-center font-mono text-xs font-bold text-white focus:outline-none">
+                                    <button onclick="stepSetValue(${exIdx}, ${setIdx}, 'reps', 1)" class="px-1.5 py-1.5 text-slate-400 hover:text-white active:bg-slate-800 text-xs font-bold">+</button>
+                                </div>
+
+                                <div class="col-span-2">
+                                    <button onclick="cycleSetRir(${exIdx}, ${setIdx})" class="w-full py-1.5 rounded-lg border text-[10px] font-extrabold transition active:scale-95 ${rirBadgeClass}">
+                                        ${rirText}
+                                    </button>
+                                </div>
+
+                                <div class="col-span-2 flex justify-center">
+                                    <button onclick="toggleSetComplete(${exIdx}, ${setIdx})" class="w-full py-1.5 rounded-lg border flex items-center justify-center transition active:scale-90 ${checkBtnClass}">
+                                        <i class="ph-bold ph-check text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="flex justify-between items-center pt-0.5">
+                        <span class="text-[10px] text-slate-500">Tocá ✔ para auto-completar con el peso fantasma</span>
+                        <button onclick="addExtraSet(${exIdx})" class="text-[11px] font-semibold text-slate-400 hover:text-emerald-400 flex items-center gap-1 active:scale-95">
+                            <i class="ph-bold ph-plus"></i> Serie extra
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            document.getElementById('current-session-volume').textContent = `${totalVolume.toLocaleString('es-ES')} kg`;
+        }
+
+        // ----------------------------------------------------
+        // 4. INTERACCIONES DE SERIES Y TEMPORIZADOR
+        // ----------------------------------------------------
+        function selectWorkoutDay(dayId) {
+            appState.selectedDayId = dayId;
+            renderDaySelector();
+            renderExercisesList();
+        }
+
+        function cycleExerciseVariant(exIdx) {
+            const ex = appState.routine[appState.selectedDayId].exercises[exIdx];
+            ex.selectedVariant = (ex.selectedVariant + 1) % ex.variants.length;
+            renderExercisesList();
+            showToast(`Variante: ${ex.variants[ex.selectedVariant]}`);
+        }
+
+        function updateSetInput(exIdx, setIdx, field, val) {
+            const setObj = appState.routine[appState.selectedDayId].exercises[exIdx].sets[setIdx];
+            setObj[field] = val;
+            renderExercisesList();
+            saveAppState();
+        }
+
+        function stepSetValue(exIdx, setIdx, field, delta) {
+            const ex = appState.routine[appState.selectedDayId].exercises[exIdx];
+            const setObj = ex.sets[setIdx];
+            const variantName = ex.variants[ex.selectedVariant];
+            const ghost = getGhostForVariant(ex, variantName);
+
+            let currentVal = parseFloat(setObj[field]);
+            if (isNaN(currentVal)) {
+                if (setIdx > 0 && ex.sets[setIdx - 1][field] !== '') {
+                    currentVal = parseFloat(ex.sets[setIdx - 1][field]);
+                } else {
+                    currentVal = field === 'weight' ? ghost.weight : ghost.reps;
+                }
+            }
+            const nextVal = Math.max(0, currentVal + delta);
+            setObj[field] = nextVal;
+            renderExercisesList();
+            saveAppState();
+        }
+
+        function cycleSetRir(exIdx, setIdx) {
+            const setObj = appState.routine[appState.selectedDayId].exercises[exIdx].sets[setIdx];
+            if (setObj.rir === 1) setObj.rir = 2;
+            else if (setObj.rir === 2) setObj.rir = 0;
+            else setObj.rir = 1;
+            renderExercisesList();
+            saveAppState();
+        }
+
+        function toggleSetComplete(exIdx, setIdx) {
+            const ex = appState.routine[appState.selectedDayId].exercises[exIdx];
+            const setObj = ex.sets[setIdx];
+            const variantName = ex.variants[ex.selectedVariant];
+            const ghost = getGhostForVariant(ex, variantName);
+
+            setObj.done = !setObj.done;
+
+            if (setObj.done) {
+                if (setObj.weight === '' || setObj.weight === null) {
+                    if (setIdx > 0 && ex.sets[setIdx - 1].weight !== '') {
+                        setObj.weight = ex.sets[setIdx - 1].weight;
+                    } else {
+                        setObj.weight = ghost.weight;
+                    }
+                }
+                if (setObj.reps === '' || setObj.reps === null) {
+                    if (setIdx > 0 && ex.sets[setIdx - 1].reps !== '') {
+                        setObj.reps = ex.sets[setIdx - 1].reps;
+                    } else {
+                        setObj.reps = ghost.reps;
+                    }
+                }
+
+                const seconds = ex.type === 'compound' ? 150 : 90;
+                startRestTimer(seconds, currentVariantShortName(variantName));
+            }
+
+            renderExercisesList();
+            saveAppState();
+        }
+
+        function currentVariantShortName(name) {
+            return name.length > 22 ? name.substring(0, 22) + '…' : name;
+        }
+
+        function addExtraSet(exIdx) {
+            const ex = appState.routine[appState.selectedDayId].exercises[exIdx];
+            const lastSet = ex.sets[ex.sets.length - 1] || { weight: '', reps: '', rir: 1 };
+            ex.sets.push({
+                weight: lastSet.weight,
+                reps: lastSet.reps,
+                rir: 0,
+                done: false
+            });
+            renderExercisesList();
+            saveAppState();
+        }
+
+        // ----------------------------------------------------
+        // 5. TEMPORIZADOR FLOTANTE CON SONIDO TONE.JS
+        // ----------------------------------------------------
+        let timerInterval = null;
+        let timerSecondsLeft = 0;
+        let timerPaused = false;
+
+        function playTimerBeep() {
+            try {
+                const synth = new Tone.Synth().toDestination();
+                const now = Tone.now();
+                synth.triggerAttackRelease("C5", "16n", now);
+                synth.triggerAttackRelease("E5", "16n", now + 0.15);
+                synth.triggerAttackRelease("G5", "8n", now + 0.3);
+            } catch (e) {}
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+
+        function startRestTimer(seconds, labelText) {
+            clearInterval(timerInterval);
+            timerSecondsLeft = seconds;
+            timerPaused = false;
+
+            const bar = document.getElementById('floating-timer');
+            bar.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none', 'timer-finished');
+            document.getElementById('timer-label').textContent = `Descanso • ${labelText}`;
+            document.getElementById('timer-play-icon').className = 'ph-fill ph-pause text-lg';
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                if (timerPaused) return;
+                timerSecondsLeft--;
+                updateTimerDisplay();
+
+                if (timerSecondsLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer-label').textContent = '¡A TIRAR LA SIGUIENTE SERIE!';
+                    bar.classList.add('timer-finished');
+                    playTimerBeep();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const s = Math.max(0, timerSecondsLeft);
+            const mins = String(Math.floor(s / 60)).padStart(2, '0');
+            const secs = String(s % 60).padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${mins}:${secs}`;
+        }
+
+        function toggleTimerPause() {
+            timerPaused = !timerPaused;
+            document.getElementById('timer-play-icon').className = timerPaused
+                ? 'ph-fill ph-play text-lg'
+                : 'ph-fill ph-pause text-lg';
+        }
+
+        function adjustTimer(delta) {
+            timerSecondsLeft = Math.max(0, timerSecondsLeft + delta);
+            document.getElementById('floating-timer').classList.remove('timer-finished');
+            updateTimerDisplay();
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            const bar = document.getElementById('floating-timer');
+            bar.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            bar.classList.remove('timer-finished');
+        }
+
+        // ----------------------------------------------------
+        // 6. FINALIZAR Y GUARDAR SESIÓN + CALCULAR FANTASMAS
+        // ----------------------------------------------------
+        function finishWorkoutSession() {
+            const dayObj = appState.routine[appState.selectedDayId];
+            const now = new Date();
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+            if (dayObj.isBasket) {
+                appState.dailyNutrition.isBasketDay = true;
+                appState.workoutLogs.unshift({
+                    id: 'log_' + Date.now(),
+                    isoDate: getTodayDateKey(),
+                    date: dateStr,
+                    dayId: 'basket',
+                    title: '🏀 Partido de Básquet',
+                    volume: 0,
+                    setsCount: `${appState.basketDuration} min`,
+                    details: [`${appState.basketSessionIntensity} (${appState.basketDuration} min) • Meta ajustada a 3400 kcal`],
+                    exercises: []
+                });
+                saveAppState(true);
+                renderAll();
+                showToast('🏀 Básquet registrado • Meta subida a 3400 kcal');
+                switchTab('combustible');
+                return;
+            }
+
+            let sessionVolume = 0;
+            let completedSetsCount = 0;
+            let summaryLines = [];
+            let structuredExercises = [];
+
+            dayObj.exercises.forEach(ex => {
+                const variantName = ex.variants[ex.selectedVariant];
+                const doneSets = ex.sets.filter(s => s.done && s.weight !== '' && s.reps !== '');
+
+                if (doneSets.length > 0) {
+                    let bestWeight = 0;
+                    let bestReps = 0;
+                    let exVolume = 0;
+                    let best1RM = 0;
+                    let allRir2Plus = true;
+                    const recordedSets = [];
+
+                    doneSets.forEach(s => {
+                        const w = parseFloat(s.weight) || 0;
+                        const r = parseInt(s.reps) || 0;
+                        const vol = w * r;
+                        sessionVolume += vol;
+                        exVolume += vol;
+                        completedSetsCount++;
+
+                        const e1rm = calcEpley1RM(w, r);
+                        if (e1rm > best1RM) best1RM = e1rm;
+
+                        if (w >= bestWeight) {
+                            bestWeight = w;
+                            bestReps = r;
+                        }
+                        if (s.rir < 2) {
+                            allRir2Plus = false;
+                        }
+                        recordedSets.push({ weight: w, reps: r, rir: s.rir });
+                    });
+
+                    appState.ghostHistory[variantName] = {
+                        weight: bestWeight,
+                        reps: bestReps,
+                        allRir2Plus: allRir2Plus && doneSets.length >= 2,
+                        date: dateStr,
+                        isInitialSuggestion: false
+                    };
+
+                    summaryLines.push(`${variantName}: ${doneSets.length}x (${bestWeight}kg × ${bestReps})`);
+                    structuredExercises.push({
+                        name: variantName,
+                        setsCount: doneSets.length,
+                        bestWeight,
+                        bestReps,
+                        est1RM: best1RM,
+                        volume: exVolume,
+                        sets: recordedSets
+                    });
+                }
+
+                ex.sets.forEach(s => {
+                    s.done = false;
+                    s.weight = '';
+                    s.reps = '';
+                });
+            });
+
+            if (completedSetsCount === 0) {
+                showToast('Marcá al menos 1 serie con ✔ antes de finalizar');
+                return;
+            }
+
+            appState.workoutLogs.unshift({
+                id: 'log_' + Date.now(),
+                isoDate: getTodayDateKey(),
+                date: dateStr,
+                dayId: dayObj.id,
+                title: dayObj.shortName,
+                volume: Math.round(sessionVolume * 10) / 10,
+                setsCount: `${completedSetsCount} series`,
+                details: summaryLines,
+                exercises: structuredExercises
+            });
+
+            stopTimer();
+            saveAppState(true);
+            renderAll();
+
+            document.getElementById('celebration-title').textContent = dayObj.shortName;
+            document.getElementById('celebration-volume').textContent = `${sessionVolume.toLocaleString('es-ES')} kg`;
+            document.getElementById('celebration-sets').textContent = completedSetsCount;
+            const modal = document.getElementById('modal-celebration');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCelebrationModal() {
+            const modal = document.getElementById('modal-celebration');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            switchTab('combustible');
+        }
+
+        // ----------------------------------------------------
+        // 7. PESTAÑA "COMBUSTIBLE" (NUTRICIÓN Y PESO)
+        // ----------------------------------------------------
+        const NUTRITION_ITEMS = [
+            {
+                key: 'meal1',
+                title: 'Comida Principal 1 (Desayuno / Almuerzo)',
+                subtitle: 'Huevos/Soja/Legumbres + Carbohidratos complejos',
+                prot: 38,
+                kcal: 750,
+                icon: 'ph-egg-crack'
+            },
+            {
+                key: 'meal2',
+                title: 'Comida Principal 2',
+                subtitle: 'Plato fuerte con proteína + arroz/pasta/patata + aceite oliva',
+                prot: 40,
+                kcal: 850,
+                icon: 'ph-bowl-food'
+            },
+            {
+                key: 'hsnShake',
+                title: 'Batido HSN: 45-50g Soja + 60g Evocarbs',
+                subtitle: 'Post-entreno o Post-básquet (~40g prot neta + 54g carbs rápidos)',
+                prot: 40,
+                kcal: 410,
+                icon: 'ph-lightning',
+                highlight: true
+            },
+            {
+                key: 'meal3',
+                title: 'Comida Principal 3 (Cena)',
+                subtitle: 'Fuente proteica completa + verduras + grasas saludables',
+                prot: 38,
+                kcal: 780,
+                icon: 'ph-moon-stars'
+            },
+            {
+                key: 'meal4',
+                title: '4.ª Comida / Extra Calórico Rápido',
+                subtitle: 'Crema de cacahuete, frutos secos, avena o 1/2 scoop extra',
+                prot: 20,
+                kcal: 430,
+                icon: 'ph-nut'
+            }
+        ];
+
+        function renderNutritionTab() {
+            const container = document.getElementById('nutrition-checks-list');
+            let totalProt = 0;
+            let totalKcal = 0;
+
+            container.innerHTML = NUTRITION_ITEMS.map(item => {
+                const checked = !!appState.dailyNutrition[item.key];
+                if (checked) {
+                    totalProt += item.prot;
+                    totalKcal += item.kcal;
+                }
+
+                const cardStyle = checked
+                    ? 'bg-emerald-950/40 border-emerald-500/60'
+                    : (item.highlight ? 'bg-slate-800/90 border-amber-500/40' : 'bg-slate-800/60 border-slate-700/80');
+
+                const checkCircle = checked
+                    ? 'bg-emerald-500 text-slate-950 border-emerald-400'
+                    : 'bg-slate-900 text-slate-500 border-slate-700';
+
+                return `
+                <button onclick="toggleNutritionItem('${item.key}')" class="w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-3 transition active:scale-98 ${cardStyle}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900/90 border border-slate-700 flex items-center justify-center ${checked ? 'text-emerald-400' : (item.highlight ? 'text-amber-400' : 'text-slate-400')} shrink-0">
+                            <i class="ph-fill ${item.icon} text-xl"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-xs text-white flex items-center gap-1.5">
+                                <span>${item.title}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-0.5">${item.subtitle}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] font-mono font-bold text-emerald-400">+${item.prot}g Prot</span>
+                                <span class="text-[10px] font-mono text-amber-400">+${item.kcal} kcal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${checkCircle}">
+                        <i class="ph-bold ph-check text-sm"></i>
+                    </div>
+                </button>
+                `;
+            }).join('');
+
+            const targetKcal = appState.dailyNutrition.isBasketDay ? 3400 : 3200;
+            document.getElementById('fuel-kcal-current').textContent = totalKcal;
+            document.getElementById('fuel-kcal-target').textContent = targetKcal;
+            document.getElementById('fuel-prot-current').textContent = totalProt;
+
+            const kcalPct = Math.min(100, Math.round((totalKcal / targetKcal) * 100));
+            const protPct = Math.min(100, Math.round((totalProt / 155) * 100));
+
+            document.getElementById('fuel-kcal-bar').style.width = `${kcalPct}%`;
+            document.getElementById('fuel-prot-bar').style.width = `${protPct}%`;
+
+            const basketBtn = document.getElementById('basket-calorie-toggle');
+            const basketLabel = document.getElementById('basket-toggle-label');
+            if (appState.dailyNutrition.isBasketDay) {
+                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-amber-500/20 border-amber-500/50 text-amber-300 flex items-center gap-1.5 transition active:scale-95';
+                basketLabel.textContent = 'Día Básquet (3400 kcal)';
+            } else {
+                basketBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border bg-slate-900 border-slate-700 text-slate-300 flex items-center gap-1.5 transition active:scale-95';
+                basketLabel.textContent = 'Día Normal (3200 kcal)';
+            }
+
+            document.getElementById('quick-meal-idea-text').textContent = QUICK_MEAL_IDEAS[appState.ideaIndex % QUICK_MEAL_IDEAS.length];
+
+            renderWeightChart();
+            updateHeaderStats();
+        }
+
+        function toggleNutritionItem(key) {
+            appState.dailyNutrition[key] = !appState.dailyNutrition[key];
+            renderNutritionTab();
+            saveAppState();
+        }
+
+        function toggleBasketBonusToday() {
+            appState.dailyNutrition.isBasketDay = !appState.dailyNutrition.isBasketDay;
+            renderNutritionTab();
+            saveAppState();
+            showToast(appState.dailyNutrition.isBasketDay ? 'Meta subida a 3400 kcal por Básquet' : 'Meta estándar: 3200 kcal');
+        }
+
+        function cycleQuickMealIdea() {
+            appState.ideaIndex = (appState.ideaIndex + 1) % QUICK_MEAL_IDEAS.length;
+            document.getElementById('quick-meal-idea-text').textContent = QUICK_MEAL_IDEAS[appState.ideaIndex];
+        }
+
+        function logBodyWeight() {
+            const input = document.getElementById('weight-input');
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 40 || val > 180) return;
+
+            const now = new Date();
+            const label = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+            appState.weightHistory.push({ date: label, weight: val });
+            if (appState.weightHistory.length > 8) {
+                appState.weightHistory.shift();
+            }
+            renderWeightChart();
+            saveAppState();
+            showToast(`Peso actualizado: ${val.toFixed(1)} kg`);
+        }
+
+        function renderWeightChart() {
+            const container = document.getElementById('weight-chart-container');
+            const history = appState.weightHistory;
+            const latest = history[history.length - 1]?.weight || 75.0;
+            document.getElementById('weight-input').value = latest.toFixed(1);
+
+            const minW = Math.min(73.5, ...history.map(h => h.weight)) - 0.5;
+            const maxW = Math.max(80.0, ...history.map(h => h.weight)) + 0.5;
+
+            container.innerHTML = `
+                <div class="flex items-end justify-between gap-2 h-28 pt-4 px-2 bg-slate-900/70 rounded-xl border border-slate-800">
+                    ${history.map((entry, idx) => {
+                        const pct = Math.max(15, Math.min(100, ((entry.weight - minW) / (maxW - minW)) * 100));
+                        const isLast = idx === history.length - 1;
+                        return `
+                        <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                            <span class="font-mono text-[10px] font-bold ${isLast ? 'text-emerald-400' : 'text-slate-400'}">${entry.weight.toFixed(1)}</span>
+                            <div class="w-full max-w-[28px] rounded-t-lg transition-all ${isLast ? 'bg-emerald-500' : 'bg-slate-700'}" style="height: ${pct}%"></div>
+                            <span class="text-[9px] text-slate-500 font-medium pb-1">${entry.date}</span>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function updateHeaderStats() {
+            let totalProt = 0;
+            NUTRITION_ITEMS.forEach(item => {
+                if (appState.dailyNutrition[item.key]) totalProt += item.prot;
+            });
+            const latestWeight = appState.weightHistory[appState.weightHistory.length - 1]?.weight || 75.0;
+            const targetKcal = appState.dailyNutrition.isBasketDay ? 3400 : 3200;
+
+            document.getElementById('header-prot').textContent = totalProt;
+            document.getElementById('header-weight').textContent = `${latestWeight.toFixed(1)} kg`;
+            document.getElementById('header-kcal').textContent = `${targetKcal} kcal`;
+        }
+
+        // ----------------------------------------------------
+        // 8. PESTAÑA "MÉTRICAS E HISTORIAL" (3 GRÁFICOS CHART.JS)
+        // ----------------------------------------------------
+        let chartVolumeInstance = null;
+        let chartStrengthInstance = null;
+        let chartDistInstance = null;
+
+        function renderHistoryTab() {
+            const gymLogs = appState.workoutLogs.filter(l => (l.volume || 0) > 0);
+            const totalVol = gymLogs.reduce((acc, l) => acc + (l.volume || 0), 0);
+            const avgVol = gymLogs.length > 0 ? Math.round(totalVol / gymLogs.length) : 0;
+
+            document.getElementById('history-total-sessions').textContent = appState.workoutLogs.length;
+            document.getElementById('metrics-total-tonnage').textContent = totalVol >= 1000
+                ? `${(totalVol / 1000).toFixed(1)}t`
+                : `${Math.round(totalVol)} kg`;
+            document.getElementById('metrics-avg-volume').textContent = `${avgVol.toLocaleString('es-ES')} kg`;
+
+            // Renderizar las 3 métricas si la pestaña es visible
+            if (appState.currentTab === 'historial' && typeof Chart !== 'undefined') {
+                renderMetric1VolumeChart(gymLogs);
+                populateMetric2ExerciseSelect();
+                renderMetric2Chart();
+                renderMetric3DistributionChart();
+            }
+
+            // Renderizar PRs / Fantasmas
+            const prContainer = document.getElementById('pr-list-container');
+            const ghostKeys = Object.keys(appState.ghostHistory);
+
+            if (ghostKeys.length === 0) {
+                prContainer.innerHTML = `
+                    <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-4 text-center text-xs text-slate-400">
+                        Completá tu primer entrenamiento para ver acá tus récords y sugerencias automáticas de aumento de cargas.
+                    </div>
+                `;
+            } else {
+                prContainer.innerHTML = ghostKeys.map(exName => {
+                    const g = appState.ghostHistory[exName];
+                    const e1rm = calcEpley1RM(g.weight, g.reps);
+                    return `
+                    <div class="bg-slate-800/70 border border-slate-700/70 rounded-xl p-3 flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-xs text-white">${exName}</div>
+                            <span class="text-[10px] text-slate-400">Última: ${g.date || 'Reciente'} • 1RM est: <strong class="text-amber-300 font-mono">${e1rm}kg</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${g.allRir2Plus ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">+2.5kg</span>` : ''}
+                            <span class="font-mono text-sm font-extrabold text-emerald-400">${g.weight}kg × ${g.reps}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            // Renderizar bitácora de sesiones
+            const logsContainer = document.getElementById('workout-history-list');
+            if (appState.workoutLogs.length === 0) {
+                logsContainer.innerHTML = `
+                    <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 text-center text-xs text-slate-400">
+                        Todavía no hay sesiones guardadas en la bitácora.
+                    </div>
+                `;
+            } else {
+                logsContainer.innerHTML = appState.workoutLogs.map(log => `
+                    <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-3.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">${log.date}</span>
+                                <h4 class="font-extrabold text-sm text-white">${log.title}</h4>
+                            </div>
+                            <span class="font-mono text-xs font-bold text-emerald-400">${log.volume > 0 ? log.volume.toLocaleString('es-ES') + ' kg' : log.setsCount}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-300 space-y-0.5 pl-1 border-l-2 border-emerald-500/40">
+                            ${(log.details || []).map(line => `<div>• ${line}</div>`).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // MÉTRICA 1: Volumen Total por Sesión
+        function renderMetric1VolumeChart(gymLogs) {
+            const emptyEl = document.getElementById('chart-volume-empty');
+            const deltaEl = document.getElementById('metric1-delta');
+            const canvas = document.getElementById('chart-volume');
+
+            if (chartVolumeInstance) {
+                chartVolumeInstance.destroy();
+                chartVolumeInstance = null;
+            }
+
+            if (gymLogs.length === 0) {
+                emptyEl.classList.remove('hidden');
+                deltaEl.textContent = '--';
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            // Últimas 10 sesiones en orden cronológico
+            const recent = [...gymLogs].slice(0, 10).reverse();
+            const labels = recent.map(l => `${l.date}`);
+            const values = recent.map(l => Math.round(l.volume));
+
+            if (recent.length >= 2) {
+                const prev = values[values.length - 2];
+                const curr = values[values.length - 1];
+                const diffPct = prev > 0 ? Math.round(((curr - prev) / prev) * 100) : 0;
+                deltaEl.textContent = `${diffPct >= 0 ? '+' : ''}${diffPct}% vs ant.`;
+                deltaEl.className = `text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                    diffPct >= 0
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                        : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                }`;
+            } else {
+                deltaEl.textContent = `${values[0].toLocaleString('es-ES')} kg`;
+            }
+
+            chartVolumeInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Volumen (kg)',
+                        data: values,
+                        backgroundColor: 'rgba(16, 185, 129, 0.55)',
+                        borderColor: '#10b981',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: (items) => {
+                                    const idx = items[0].dataIndex;
+                                    return `${recent[idx].date} • ${recent[idx].title}`;
+                                },
+                                label: (ctx) => ` ${ctx.parsed.y.toLocaleString('es-ES')} kg movidos`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51,65,85,0.35)' } }
+                    }
+                }
+            });
+        }
+
+        // MÉTRICA 2: Progresión de Fuerza (1RM Estimado + Peso Máximo por Ejercicio)
+        function populateMetric2ExerciseSelect() {
+            const select = document.getElementById('metric2-exercise-select');
+            const prevSelected = select.value;
+
+            const exerciseSet = new Set();
+            appState.workoutLogs.forEach(log => {
+                extractExerciseMetricsFromLog(log).forEach(ex => exerciseSet.add(ex.name));
+            });
+            Object.keys(appState.ghostHistory).forEach(name => exerciseSet.add(name));
+
+            const names = Array.from(exerciseSet);
+            if (names.length === 0) {
+                select.innerHTML = `<option value="">Sin ejercicios registrados aún</option>`;
+                return;
+            }
+            select.innerHTML = names.map(n => `<option value="${n.replace(/"/g, '&quot;')}">${n}</option>`).join('');
+            if (prevSelected && names.includes(prevSelected)) {
+                select.value = prevSelected;
+            }
+        }
+
+        function renderMetric2Chart() {
+            const select = document.getElementById('metric2-exercise-select');
+            const exName = select.value;
+            const emptyEl = document.getElementById('chart-strength-empty');
+            const badgeEl = document.getElementById('metric2-best-1rm');
+            const canvas = document.getElementById('chart-strength');
+
+            if (chartStrengthInstance) {
+                chartStrengthInstance.destroy();
+                chartStrengthInstance = null;
+            }
+
+            if (!exName) {
+                emptyEl.classList.remove('hidden');
+                badgeEl.textContent = '1RM: --';
+                return;
+            }
+
+            const points = [];
+            const chronological = [...appState.workoutLogs].reverse();
+            chronological.forEach(log => {
+                const exList = extractExerciseMetricsFromLog(log);
+                const found = exList.find(e => e.name === exName);
+                if (found) {
+                    points.push({
+                        date: log.date,
+                        weight: found.bestWeight,
+                        est1RM: found.est1RM || calcEpley1RM(found.bestWeight, found.bestReps),
+                        reps: found.bestReps
+                    });
+                }
+            });
+
+            // Fallback si solo existe en ghostHistory
+            if (points.length === 0 && appState.ghostHistory[exName]) {
+                const g = appState.ghostHistory[exName];
+                points.push({
+                    date: g.date || 'Actual',
+                    weight: g.weight,
+                    est1RM: calcEpley1RM(g.weight, g.reps),
+                    reps: g.reps
+                });
+            }
+
+            if (points.length === 0) {
+                emptyEl.classList.remove('hidden');
+                badgeEl.textContent = '1RM: --';
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            const max1RM = Math.max(...points.map(p => p.est1RM));
+            badgeEl.textContent = `Mejor 1RM: ${max1RM} kg`;
+
+            chartStrengthInstance = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: points.map(p => p.date),
+                    datasets: [
+                        {
+                            label: '1RM Estimado (kg)',
+                            data: points.map(p => p.est1RM),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f59e0b'
+                        },
+                        {
+                            label: 'Peso Máx (kg)',
+                            data: points.map(p => p.weight),
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            borderDash: [4, 4],
+                            tension: 0.3,
+                            pointRadius: 3.5,
+                            pointBackgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cbd5e1', font: { size: 10 }, boxWidth: 12 }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                afterBody: (items) => {
+                                    const p = points[items[0].dataIndex];
+                                    return `Mejor serie: ${p.weight}kg × ${p.reps} reps`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51,65,85,0.35)' } }
+                    }
+                }
+            });
+        }
+
+        // MÉTRICA 3: Distribución por Tipo de Día (Balance Gym + Básquet)
+        function renderMetric3DistributionChart() {
+            const emptyEl = document.getElementById('chart-distribution-empty');
+            const ratioEl = document.getElementById('metric3-basket-ratio');
+            const canvas = document.getElementById('chart-distribution');
+
+            if (chartDistInstance) {
+                chartDistInstance.destroy();
+                chartDistInstance = null;
+            }
+
+            if (appState.workoutLogs.length === 0) {
+                emptyEl.classList.remove('hidden');
+                ratioEl.textContent = '0 sesiones';
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            const counts = {};
+            let gymCount = 0;
+            let basketCount = 0;
+
+            appState.workoutLogs.forEach(log => {
+                const key = log.title || 'Otro';
+                counts[key] = (counts[key] || 0) + 1;
+                if (key.includes('Básquet') || log.dayId === 'basket') basketCount++;
+                else gymCount++;
+            });
+
+            ratioEl.textContent = `${gymCount} Gym • ${basketCount} Básquet`;
+
+            const labels = Object.keys(counts);
+            const values = Object.values(counts);
+            const palette = ['#10b981', '#38bdf8', '#a855f7', '#f59e0b', '#fb7185', '#2dd4bf'];
+
+            chartDistInstance = new Chart(canvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+                        borderColor: '#0f172a',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#cbd5e1', font: { size: 10 }, boxWidth: 10, padding: 8 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ----------------------------------------------------
+        // 9. PESTAÑA "CALENDARIO" (MODOS DE SEMANA)
+        // ----------------------------------------------------
+        const SCHEDULES = {
+            standard: [
+                { dayName: 'Lunes', plan: 'Día 1: Empuje + Cuádriceps', targetDayId: 'day1', note: 'Piernas frescas lejos del jueves', icon: 'ph-barbell' },
+                { dayName: 'Martes', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: '48h antes del partido de básquet', icon: 'ph-barbell' },
+                { dayName: 'Miércoles', plan: 'Descanso o Día 4 (Torso/Brazos)', targetDayId: 'day4', note: 'Cero impacto en piernas para mañana', icon: 'ph-person-arms-spread' },
+                { dayName: 'Jueves', plan: '🏀 Partido de Básquet', targetDayId: 'basket', note: 'Piernas al 100% • Meta: 3.400 kcal', icon: 'ph-basketball', isHighlight: true },
+                { dayName: 'Viernes', plan: 'Día 3: Full Body Híbrido', targetDayId: 'day3', note: 'Cierre de semana de hipertrofia', icon: 'ph-barbell' },
+                { dayName: 'Sábado / Dom', plan: 'Descanso y Ocio + Superávit', targetDayId: null, note: 'Recuperación muscular completa', icon: 'ph-couch' }
+            ],
+            double: [
+                { dayName: 'Lunes', plan: '🏀 Partido de Básquet #1', targetDayId: 'basket', note: 'Arranque aeróbico • Meta: 3.400 kcal', icon: 'ph-basketball', isHighlight: true },
+                { dayName: 'Martes', plan: 'Día 1: Empuje + Cuádriceps', targetDayId: 'day1', note: 'Fuerza base post-lunes', icon: 'ph-barbell' },
+                { dayName: 'Miércoles', plan: 'Día 2: Tracción + Isquios', targetDayId: 'day2', note: 'Evitar fallo extremo en femorales', icon: 'ph-barbell' },
+                { dayName: 'Jueves', plan: '🏀 Partido de Básquet #2', targetDayId: 'basket', note: 'Batido HSN + Evocarbs obligatorio', icon: 'ph-basketball', isHighlight: true },
+                { dayName: 'Viernes', plan: 'Día 3: Full Body Híbrido', targetDayId: 'day3', note: 'Estímulo global de cuerpo completo', icon: 'ph-barbell' },
+                { dayName: 'Sábado', plan: 'Día 4 Opcional (Torso/Brazos)', targetDayId: 'day4', note: 'Solo si tenés tiempo y energía', icon: 'ph-person-arms-spread' }
+            ]
+        };
+
+        function setWeekMode(mode) {
+            appState.weekMode = mode;
+            renderCalendarTab();
+            updateBannerSuggestion();
+            saveAppState();
+            showToast(mode === 'standard' ? 'Modo: Semana Estándar' : 'Modo: Semana Doble Partido');
+        }
+
+        function renderCalendarTab() {
+            const isStd = appState.weekMode === 'standard';
+            const btnStd = document.getElementById('mode-btn-standard');
+            const btnDbl = document.getElementById('mode-btn-double');
+
+            btnStd.className = `p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
+            btnDbl.className = `p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${!isStd ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/60 border-slate-800'}`;
+
+            document.getElementById('check-mode-standard').classList.toggle('hidden', !isStd);
+            document.getElementById('check-mode-double').classList.toggle('hidden', isStd);
+
+            const scheduleList = SCHEDULES[appState.weekMode];
+            const grid = document.getElementById('weekly-schedule-grid');
+
+            grid.innerHTML = scheduleList.map(item => `
+                <div class="bg-slate-800/75 border ${item.isHighlight ? 'border-amber-500/40' : 'border-slate-700/80'} rounded-2xl p-3 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center ${item.isHighlight ? 'text-amber-400' : 'text-emerald-400'}">
+                            <i class="ph-fill ${item.icon} text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-mono uppercase font-bold text-slate-400">${item.dayName}</span>
+                                <span class="text-xs font-extrabold text-white">${item.plan}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400">${item.note}</p>
+                        </div>
+                    </div>
+                    ${item.targetDayId ? `
+                        <button onclick="jumpToWorkoutDay('${item.targetDayId}')" class="px-2.5 py-1.5 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-[11px] font-bold text-emerald-300 shrink-0 active:scale-95">
+                            Abrir
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function jumpToWorkoutDay(dayId) {
+            appState.selectedDayId = dayId;
+            switchTab('entrenar');
+        }
+
+        function updateBannerSuggestion() {
+            const jsDay = new Date().getDay();
+            const modeText = appState.weekMode === 'standard'
+                ? 'Modo: Semana Estándar (Básquet Jueves)'
+                : 'Modo: Semana Doble Partido (Lun y Jue)';
+            document.getElementById('banner-week-mode').textContent = modeText;
+
+            const mapStd = {
+                1: 'Hoy Lunes toca: Día 1 (Empuje + Cuádriceps)',
+                2: 'Hoy Martes toca: Día 2 (Tracción + Isquios)',
+                3: 'Hoy Miércoles: Descanso o Día 4 (Torso/Brazos)',
+                4: 'Hoy Jueves: 🏀 Partido de Básquet (Meta 3400 kcal)',
+                5: 'Hoy Viernes toca: Día 3 (Full Body Híbrido)',
+                6: 'Fin de semana: Descanso y cumplir superávit',
+                0: 'Domingo: Descanso y preparar la semana'
+            };
+            const mapDbl = {
+                1: 'Hoy Lunes: 🏀 Partido de Básquet #1',
+                2: 'Hoy Martes toca: Día 1 (Empuje + Cuádriceps)',
+                3: 'Hoy Miércoles toca: Día 2 (Tracción + Isquios)',
+                4: 'Hoy Jueves: 🏀 Partido de Básquet #2',
+                5: 'Hoy Viernes toca: Día 3 (Full Body Híbrido)',
+                6: 'Hoy Sábado: Día 4 Opcional (Torso/Brazos)',
+                0: 'Domingo: Descanso total y superávit'
+            };
+
+            const text = appState.weekMode === 'standard' ? mapStd[jsDay] : mapDbl[jsDay];
+            document.getElementById('banner-today-plan').textContent = text;
+        }
+
+        // ----------------------------------------------------
+        // 10. MODALES Y NAVEGACIÓN
+        // ----------------------------------------------------
+        function switchTab(tabName) {
+            appState.currentTab = tabName;
+            const tabs = ['entrenar', 'combustible', 'historial', 'calendario'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    navBtn.className = 'flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 transition';
+                } else {
+                    navBtn.className = 'flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition';
+                }
+            });
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openAddExerciseModal() {
+            const m = document.getElementById('modal-add-exercise');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeAddExerciseModal() {
+            const m = document.getElementById('modal-add-exercise');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function confirmAddCustomExercise() {
+            const nameInput = document.getElementById('custom-ex-name');
+            const repsInput = document.getElementById('custom-ex-reps');
+            const typeInput = document.getElementById('custom-ex-type');
+
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            const dayObj = appState.routine[appState.selectedDayId];
+            if (!dayObj || dayObj.isBasket) return;
+
+            dayObj.exercises.push({
+                id: 'custom_' + Date.now(),
+                variants: [name],
+                selectedVariant: 0,
+                targetReps: repsInput.value.trim() || '10-12 reps',
+                type: typeInput.value,
+                defaultWeight: 20,
+                defaultReps: 10,
+                sets: [
+                    { weight: '', reps: '', rir: 1, done: false },
+                    { weight: '', reps: '', rir: 1, done: false },
+                    { weight: '', reps: '', rir: 0, done: false }
+                ]
+            });
+
+            nameInput.value = '';
+            closeAddExerciseModal();
+            renderExercisesList();
+            saveAppState();
+            showToast('Ejercicio agregado al día');
+        }
+
+        function updateBasketDuration(val) {
+            appState.basketDuration = parseInt(val) || 60;
+        }
+
+        function updateBasketIntensity(val) {
+            appState.basketSessionIntensity = val;
+        }
+
+        function openResetConfirmModal() {
+            const m = document.getElementById('modal-reset');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeResetConfirmModal() {
+            const m = document.getElementById('modal-reset');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function confirmResetAllData() {
+            appState.routine = JSON.parse(JSON.stringify(INITIAL_ROUTINE));
+            appState.ghostHistory = {};
+            appState.workoutLogs = [];
+            appState.weightHistory = [{ date: 'Inicio', weight: 75.0 }];
+            closeResetConfirmModal();
+            renderAll();
+            saveAppState(true);
+            showToast('Datos restaurados a valores iniciales');
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-text').textContent = msg;
+            toast.classList.remove('opacity-0', '-translate-y-3');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-3');
+            }, 2600);
+        }
+
+        function renderAll() {
+            updateBannerSuggestion();
+            renderDaySelector();
+            renderExercisesList();
+            renderNutritionTab();
+            renderHistoryTab();
+            renderCalendarTab();
+        }
+
+        // Arrancar aplicación al cargar ventana
+        window.onload = function() {
+            loadLocalState();
+            renderAll();
+            setSyncBadge('local', 'Local');
+        };
+    </script>
+</body>
+</html>
