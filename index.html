@@ -32,6 +32,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="HyperGym">
+    <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./icon-512.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
 
@@ -108,8 +109,8 @@
     <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center gap-2.5 min-w-0">
-                <button onclick="openProfileModal()" title="Editar Perfil y Objetivos" class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 active:scale-95 transition">
-                    <i class="ph-bold ph-barbell text-xl"></i>
+                <button onclick="openProfileModal()" title="Editar Perfil y Objetivos" class="w-10 h-10 rounded-xl overflow-hidden border border-emerald-500/50 shadow-md shadow-emerald-500/15 shrink-0 active:scale-95 transition bg-slate-950">
+                    <img src="./icon-512.png" alt="HyperGym" class="w-full h-full object-cover">
                 </button>
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
@@ -716,6 +717,26 @@
                     <span id="celebration-sets" class="font-mono text-lg font-extrabold text-white">0</span>
                 </div>
             </div>
+
+            <!-- Foto opcional post-entreno -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3 space-y-2.5 text-left">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+                        <i class="ph-fill ph-camera text-emerald-400 text-base"></i>
+                        Foto Post-Entreno <span class="text-slate-400 font-normal">(Opcional)</span>
+                    </span>
+                    <button id="celebration-photo-remove" onclick="removeCelebrationPhoto()" class="hidden text-[10px] font-bold text-rose-400 hover:underline">Quitar</button>
+                </div>
+                <div id="celebration-photo-preview-wrap" class="hidden">
+                    <img id="celebration-photo-preview" src="" alt="Foto del entrenamiento" class="w-full max-h-44 object-cover rounded-xl border border-emerald-500/40">
+                </div>
+                <label id="celebration-photo-btn" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-950 border border-dashed border-slate-600 text-xs font-bold text-emerald-300 flex items-center justify-center gap-2 cursor-pointer transition active:scale-95">
+                    <i class="ph-bold ph-camera-plus text-base"></i>
+                    <span>Tomar o subir foto del progreso</span>
+                    <input id="celebration-photo-input" type="file" accept="image/*" capture="environment" onchange="handleCelebrationPhotoSelect(event)" class="hidden">
+                </label>
+            </div>
+
             <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left flex items-center gap-2.5">
                 <i class="ph-fill ph-lightning text-amber-400 text-2xl shrink-0"></i>
                 <p id="celebration-tip" class="text-[11px] text-amber-200 leading-tight">
@@ -724,6 +745,66 @@
             </div>
             <button onclick="closeCelebrationModal()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-sm">
                 Ir a Combustible
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: VISOR DE FOTO DE ENTRENAMIENTO      -->
+    <!-- ========================================== -->
+    <div id="modal-photo-viewer" onclick="closePhotoViewer()" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden items-center justify-center p-4">
+        <div onclick="event.stopPropagation()" class="max-w-sm w-full space-y-3 text-center">
+            <div class="flex items-center justify-between text-white px-1">
+                <span id="photo-viewer-caption" class="text-xs font-bold text-slate-200">Foto del entrenamiento</span>
+                <button onclick="closePhotoViewer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center">
+                    <i class="ph-bold ph-x text-base"></i>
+                </button>
+            </div>
+            <img id="photo-viewer-img" src="" alt="Progreso entrenamiento" class="w-full max-h-[75vh] object-contain rounded-2xl border border-slate-700 shadow-2xl bg-slate-900">
+        </div>
+    </div>
+
+    <!-- Input oculto para agregar foto a una sesión del historial -->
+    <input id="history-photo-input" type="file" accept="image/*" onchange="handleHistoryPhotoSelect(event)" class="hidden">
+
+    <!-- ========================================== -->
+    <!-- BOTÓN ESTILO GLOBO: INSTALAR APP EN CELU   -->
+    <!-- (Desaparece automáticamente si está instalada) -->
+    <!-- ========================================== -->
+    <div id="install-bubble-container" class="hidden fixed bottom-20 right-4 z-40 flex items-center gap-1.5">
+        <button onclick="triggerInstallApp()" class="group bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs pl-3.5 pr-4 py-2.5 rounded-full shadow-xl shadow-emerald-500/30 border border-emerald-300/60 flex items-center gap-2 transition active:scale-95">
+            <span class="w-6 h-6 rounded-full bg-slate-950/15 flex items-center justify-center">
+                <i class="ph-bold ph-download-simple text-sm"></i>
+            </span>
+            <span>Instalar App</span>
+        </button>
+        <button onclick="dismissInstallBubble()" title="Ocultar" class="w-7 h-7 rounded-full bg-slate-900/90 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center shadow-lg active:scale-90">
+            <i class="ph-bold ph-x text-xs"></i>
+        </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: GUÍA DE INSTALACIÓN (iOS / FALLBACK) -->
+    <!-- ========================================== -->
+    <div id="modal-install-guide" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <img src="./icon-512.png" alt="HyperGym" class="w-10 h-10 rounded-xl border border-emerald-500/40">
+                    <div>
+                        <h3 class="font-extrabold text-sm text-white">Instalar HyperGym</h3>
+                        <p class="text-[11px] text-slate-400">Usala como app nativa en tu celular</p>
+                    </div>
+                </div>
+                <button onclick="closeInstallGuideModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div id="install-guide-steps" class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-2.5 text-xs text-slate-200 leading-relaxed"></div>
+
+            <button onclick="closeInstallGuideModal()" class="w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                Entendido
             </button>
         </div>
     </div>
@@ -794,35 +875,85 @@
         const DRIVE_CSV_FILENAME = 'hypergym_metricas.csv';
         const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-        // Generar manifest PWA dinámico
-        (function injectInlineManifest() {
-            try {
-                const iconUrl = new URL('./icon-512.png', window.location.href).href;
-                const manifest = {
-                    name: 'HyperGym | Entrenamiento y Métricas',
-                    short_name: 'HyperGym',
-                    description: 'Tracker de gimnasio, nutrición, métricas de fuerza y respaldo en Google Drive.',
-                    start_url: window.location.href.split('#')[0],
-                    display: 'standalone',
-                    background_color: '#0f172a',
-                    theme_color: '#0f172a',
-                    orientation: 'portrait',
-                    icons: [
-                        {
-                            src: iconUrl,
-                            sizes: '512x512',
-                            type: 'image/png',
-                            purpose: 'any maskable'
-                        }
-                    ]
-                };
-                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-                const link = document.createElement('link');
-                link.rel = 'manifest';
-                link.href = URL.createObjectURL(blob);
-                document.head.appendChild(link);
-            } catch (e) {}
-        })();
+        // Registrar Service Worker y controlar botón flotante de instalación PWA
+        let deferredInstallPrompt = null;
+        let installBubbleDismissed = false;
+
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: fullscreen)').matches
+                || window.navigator.standalone === true
+                || document.referrer.includes('android-app://');
+        }
+
+        function updateInstallBubbleVisibility() {
+            const bubble = document.getElementById('install-bubble-container');
+            if (!bubble) return;
+            if (isRunningStandalone() || installBubbleDismissed) {
+                bubble.classList.add('hidden');
+            } else {
+                bubble.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            updateInstallBubbleVisibility();
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            installBubbleDismissed = true;
+            updateInstallBubbleVisibility();
+            showToast('¡HyperGym instalada en tu celular!');
+        });
+
+        async function triggerInstallApp() {
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                const choice = await deferredInstallPrompt.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    deferredInstallPrompt = null;
+                    updateInstallBubbleVisibility();
+                }
+                return;
+            }
+            // Fallback visual para iPhone (Safari) u otros navegadores
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const stepsEl = document.getElementById('install-guide-steps');
+            if (isIOS) {
+                stepsEl.innerHTML = `
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">1.</span><span>Tocá el botón <strong>Compartir</strong> (<i class="ph-bold ph-export"></i>) en la barra inferior de Safari.</span></div>
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">2.</span><span>Deslizá y tocá <strong>"Añadir a pantalla de inicio"</strong>.</span></div>
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">3.</span><span>Tocá <strong>Añadir</strong> y abrí HyperGym desde tu inicio.</span></div>
+                `;
+            } else {
+                stepsEl.innerHTML = `
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">1.</span><span>Tocá el menú de tu navegador (<strong>⋮</strong> arriba a la derecha).</span></div>
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">2.</span><span>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Añadir a pantalla de inicio"</strong>.</span></div>
+                    <div class="flex items-start gap-2.5"><span class="font-mono font-extrabold text-emerald-400">3.</span><span>Al abrirla desde el ícono instalado, este botón desaparecerá automáticamente.</span></div>
+                `;
+            }
+            const m = document.getElementById('modal-install-guide');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeInstallGuideModal() {
+            const m = document.getElementById('modal-install-guide');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function dismissInstallBubble() {
+            installBubbleDismissed = true;
+            updateInstallBubbleVisibility();
+        }
+
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
 
         // Helper para crear series limpias
         function makeSets(count, lastRir = 1) {
@@ -1444,6 +1575,59 @@
                 headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
                 body
             });
+        }
+
+        let drivePhotosFolderId = null;
+
+        async function ensureDrivePhotosFolder() {
+            if (drivePhotosFolderId) return drivePhotosFolderId;
+            const rootId = await ensureDriveFolder();
+            const q = encodeURIComponent(`name='Fotos' and '${rootId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+            const res = await driveApiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
+            const data = await res.json();
+            if (data.files && data.files.length > 0) {
+                drivePhotosFolderId = data.files[0].id;
+                return drivePhotosFolderId;
+            }
+            const createRes = await driveApiFetch('https://www.googleapis.com/drive/v3/files', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'Fotos',
+                    mimeType: 'application/vnd.google-apps.folder',
+                    parents: [rootId]
+                })
+            });
+            const created = await createRes.json();
+            drivePhotosFolderId = created.id;
+            return drivePhotosFolderId;
+        }
+
+        async function uploadPhotoToGoogleDrive(dataUrl, fileName) {
+            if (!driveAccessToken || !dataUrl) return;
+            try {
+                const photosFolderId = await ensureDrivePhotosFolder();
+                const base64Data = dataUrl.split(',')[1];
+                const binaryStr = atob(base64Data);
+                const bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+                const blob = new Blob([bytes], { type: 'image/jpeg' });
+
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify({
+                    name: fileName,
+                    mimeType: 'image/jpeg',
+                    parents: [photosFolderId]
+                })], { type: 'application/json' }));
+                form.append('file', blob);
+
+                await driveApiFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    body: form
+                });
+            } catch (err) {
+                console.warn('No se pudo subir la foto a Drive:', err);
+            }
         }
 
         async function syncToGoogleDrive(showFeedback = true) {
@@ -2205,8 +2389,9 @@
                 return;
             }
 
+            const newLogId = 'log_' + Date.now();
             appState.workoutLogs.unshift({
-                id: 'log_' + Date.now(),
+                id: newLogId,
                 isoDate: getTodayDateKey(),
                 date: dateStr,
                 dayId: dayObj.id,
@@ -2215,8 +2400,12 @@
                 volume: Math.round(sessionVolume * 10) / 10,
                 setsCount: `${completedSetsCount} series`,
                 details: summaryLines,
-                exercises: structuredExercises
+                exercises: structuredExercises,
+                photoDataUrl: null
             });
+
+            lastSavedLogId = newLogId;
+            resetCelebrationPhotoUI();
 
             stopTimer();
             saveAppState(true);
@@ -2228,6 +2417,127 @@
             const modal = document.getElementById('modal-celebration');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+        }
+
+        let lastSavedLogId = null;
+        let pendingPhotoLogId = null;
+
+        function resetCelebrationPhotoUI() {
+            const wrap = document.getElementById('celebration-photo-preview-wrap');
+            const img = document.getElementById('celebration-photo-preview');
+            const rem = document.getElementById('celebration-photo-remove');
+            const btn = document.getElementById('celebration-photo-btn');
+            const inp = document.getElementById('celebration-photo-input');
+            if (wrap) wrap.classList.add('hidden');
+            if (img) img.src = '';
+            if (rem) rem.classList.add('hidden');
+            if (btn) btn.classList.remove('hidden');
+            if (inp) inp.value = '';
+        }
+
+        function compressImageToDataUrl(file, maxWidth = 720, quality = 0.72) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxWidth) {
+                            h = Math.round((h * maxWidth) / w);
+                            w = maxWidth;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = ev.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function attachPhotoToLog(logId, file) {
+            if (!logId || !file) return null;
+            const log = appState.workoutLogs.find(l => l.id === logId);
+            if (!log) return null;
+            try {
+                const dataUrl = await compressImageToDataUrl(file, 720, 0.72);
+                log.photoDataUrl = dataUrl;
+                saveAppState(true);
+                renderHistoryTab();
+                if (driveAccessToken) {
+                    const safeTitle = (log.title || 'entreno').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 24);
+                    uploadPhotoToGoogleDrive(dataUrl, `${log.isoDate || getTodayDateKey()}_${safeTitle}.jpg`);
+                }
+                showToast('📸 Foto guardada junto al entrenamiento');
+                return dataUrl;
+            } catch (err) {
+                console.error('Error procesando foto:', err);
+                showToast('No se pudo procesar la foto');
+                return null;
+            }
+        }
+
+        async function handleCelebrationPhotoSelect(event) {
+            const file = event.target.files[0];
+            if (!file || !lastSavedLogId) return;
+            const dataUrl = await attachPhotoToLog(lastSavedLogId, file);
+            if (dataUrl) {
+                document.getElementById('celebration-photo-preview').src = dataUrl;
+                document.getElementById('celebration-photo-preview-wrap').classList.remove('hidden');
+                document.getElementById('celebration-photo-remove').classList.remove('hidden');
+                document.getElementById('celebration-photo-btn').classList.add('hidden');
+            }
+        }
+
+        function removeCelebrationPhoto() {
+            if (lastSavedLogId) {
+                const log = appState.workoutLogs.find(l => l.id === lastSavedLogId);
+                if (log) {
+                    log.photoDataUrl = null;
+                    saveAppState(true);
+                    renderHistoryTab();
+                }
+            }
+            resetCelebrationPhotoUI();
+            showToast('Foto quitada');
+        }
+
+        function openHistoryPhotoPicker(logId) {
+            pendingPhotoLogId = logId;
+            const inp = document.getElementById('history-photo-input');
+            inp.value = '';
+            inp.click();
+        }
+
+        async function handleHistoryPhotoSelect(event) {
+            const file = event.target.files[0];
+            if (!file || !pendingPhotoLogId) return;
+            await attachPhotoToLog(pendingPhotoLogId, file);
+            pendingPhotoLogId = null;
+            event.target.value = '';
+        }
+
+        function openPhotoViewer(logId) {
+            const log = appState.workoutLogs.find(l => l.id === logId);
+            if (!log || !log.photoDataUrl) return;
+            document.getElementById('photo-viewer-img').src = log.photoDataUrl;
+            document.getElementById('photo-viewer-caption').textContent = `${log.date} • ${log.title}`;
+            const m = document.getElementById('modal-photo-viewer');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closePhotoViewer() {
+            const m = document.getElementById('modal-photo-viewer');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
         }
 
         function closeCelebrationModal() {
@@ -2523,15 +2833,27 @@
             } else {
                 logsContainer.innerHTML = appState.workoutLogs.map(log => `
                     <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-3.5 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">${log.date}</span>
-                                <h4 class="font-extrabold text-sm text-white">${log.title}</h4>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700 shrink-0">${log.date}</span>
+                                <h4 class="font-extrabold text-sm text-white truncate">${log.title}</h4>
                             </div>
-                            <span class="font-mono text-xs font-bold text-emerald-400">${log.volume > 0 ? log.volume.toLocaleString('es-ES') + ' kg' : log.setsCount}</span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="openHistoryPhotoPicker('${log.id}')" title="${log.photoDataUrl ? 'Cambiar foto' : 'Agregar foto opcional'}" class="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-emerald-400 active:scale-95">
+                                    <i class="ph-bold ph-camera text-xs"></i>
+                                </button>
+                                <span class="font-mono text-xs font-bold text-emerald-400">${log.volume > 0 ? log.volume.toLocaleString('es-ES') + ' kg' : log.setsCount}</span>
+                            </div>
                         </div>
-                        <div class="text-[11px] text-slate-300 space-y-0.5 pl-1 border-l-2 border-emerald-500/40">
-                            ${(log.details || []).map(line => `<div>• ${line}</div>`).join('')}
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="text-[11px] text-slate-300 space-y-0.5 pl-1 border-l-2 border-emerald-500/40 flex-1">
+                                ${(log.details || []).map(line => `<div>• ${line}</div>`).join('')}
+                            </div>
+                            ${log.photoDataUrl ? `
+                                <button onclick="openPhotoViewer('${log.id}')" class="shrink-0 group relative rounded-xl overflow-hidden border border-emerald-500/40 w-16 h-16 active:scale-95 transition">
+                                    <img src="${log.photoDataUrl}" alt="Foto entreno" class="w-full h-full object-cover">
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 `).join('');
@@ -3134,6 +3456,7 @@
             loadLocalState();
             renderAll();
             setSyncBadge('local', 'Local');
+            updateInstallBubbleVisibility();
         };
     </script>
 </body>
