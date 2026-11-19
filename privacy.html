@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad — HyperGym</title>
+    <link rel="icon" type="image/png" href="./icon-512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen px-4 py-10 font-sans">
+    <main class="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <h1 class="text-2xl font-extrabold text-white">HYPER<span class="text-emerald-400">GYM</span> — Política de Privacidad</h1>
+            <a href="./" class="text-xs font-bold text-emerald-400 hover:underline">← Volver a la app</a>
+        </div>
+
+        <p class="text-xs text-slate-400">Última actualización: Noviembre 2026</p>
+
+        <section class="space-y-2 text-sm leading-relaxed text-slate-300">
+            <h2 class="text-base font-bold text-white">1. Información que recopilamos</h2>
+            <p>
+                <strong>HyperGym</strong> es una aplicación web 100% del lado del cliente (sin servidores propios ni bases de datos externas). Todos los datos que registrás —rutinas, series, pesos, métricas de progreso, nutrición y peso corporal— se almacenan únicamente en el almacenamiento local de tu navegador (<code>localStorage</code>) y, si decidís conectar tu cuenta, en tu propio <strong>Google Drive</strong>.
+            </p>
+        </section>
+
+        <section class="space-y-2 text-sm leading-relaxed text-slate-300">
+            <h2 class="text-base font-bold text-white">2. Uso de Google Drive API</h2>
+            <p>
+                Cuando iniciás sesión con Google de forma opcional, HyperGym solicita únicamente el permiso restringido <code>https://www.googleapis.com/auth/drive.file</code>. Esto significa que la aplicación:
+            </p>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>Solo puede crear y actualizar los archivos que ella misma genera dentro de la carpeta <code>HyperGym_Data</code> en tu Google Drive (<code>hypergym_data.json</code> y <code>hypergym_metricas.csv</code>).</li>
+                <li><strong>Nunca</strong> puede leer, modificar ni eliminar ningún otro archivo o carpeta de tu Google Drive.</li>
+                <li>No transmite ni comparte tus datos con terceros ni con servidores externos.</li>
+            </ul>
+        </section>
+
+        <section class="space-y-2 text-sm leading-relaxed text-slate-300">
+            <h2 class="text-base font-bold text-white">3. Control y eliminación de datos</h2>
+            <p>
+                Tenés control total sobre tu información en todo momento. Podés exportar o borrar tus datos locales desde la app, eliminar la carpeta <code>HyperGym_Data</code> en tu Google Drive y revocar el acceso de la aplicación desde la configuración de seguridad de tu cuenta de Google.
+            </p>
+        </section>
+
+        <section class="space-y-2 text-sm leading-relaxed text-slate-300">
+            <h2 class="text-base font-bold text-white">4. Contacto</h2>
+            <p>
+                Si tenés preguntas sobre esta Política de Privacidad, podés escribir a: <a href="mailto:tuliescobarr@gmail.com" class="text-emerald-400 underline">tuliescobarr@gmail.com</a>.
+            </p>
+        </section>
+    </main>
+</body>
+</html>
