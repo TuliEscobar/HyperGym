@@ -115,7 +115,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
                         <h1 class="font-extrabold text-base tracking-tight text-white">HYPER<span class="text-emerald-400">GYM</span></h1>
-                        <button onclick="openDriveModal()" id="sync-badge" title="Google Drive y Respaldo" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 transition active:scale-95">
+                        <button onclick="handleSyncBadgeClick()" id="sync-badge" title="Google Drive y Respaldo" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 transition active:scale-95">
                             <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                             <span id="sync-label">Local</span>
                         </button>
@@ -141,6 +141,20 @@
             </button>
         </div>
     </header>
+
+    <!-- BARRA RÁPIDA DE RECONEXIÓN DRIVE (SOLO SI EXPIRÓ TOKEN >1H) -->
+    <div id="drive-reconnect-bar" class="hidden max-w-md w-full mx-auto px-3.5 pt-2.5">
+        <button onclick="reconnectSavedDriveAccount()" class="w-full bg-sky-950/70 hover:bg-sky-900/70 border border-sky-500/40 rounded-xl px-3 py-2 flex items-center justify-between gap-2 text-left transition active:scale-98">
+            <div class="flex items-center gap-2 min-w-0">
+                <i class="ph-fill ph-google-drive-logo text-sky-400 text-lg shrink-0"></i>
+                <div class="min-w-0">
+                    <div class="text-[11px] font-bold text-white truncate">Reanudar Google Drive (<span id="reconnect-bar-email">tu cuenta</span>)</div>
+                    <div class="text-[10px] text-sky-300/90">Tocá para traer tus datos y activar guardado automático</div>
+                </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 text-[10px] font-extrabold shrink-0">Sincronizar</span>
+        </button>
+    </div>
 
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-1 max-w-md w-full mx-auto px-3.5 pt-3 space-y-4">
@@ -1290,6 +1304,7 @@
                 proteinTarget: 155,
                 cardioBonusKcal: 250
             },
+            localUpdatedAt: 0,
             routine: cloneProgramRoutine('hypertrophy_sport'),
             ghostHistory: {},
             workoutLogs: [],
@@ -1310,6 +1325,8 @@
         };
 
         function serializePersistableState() {
+            const now = Date.now();
+            appState.localUpdatedAt = now;
             return {
                 activeProgramId: appState.activeProgramId,
                 weekMode: appState.weekMode,
@@ -1319,7 +1336,7 @@
                 weightHistory: appState.weightHistory,
                 dailyNutrition: appState.dailyNutrition,
                 routine: appState.routine,
-                updatedAt: Date.now()
+                updatedAt: now
             };
         }
 
@@ -1338,6 +1355,9 @@
             if (!loaded || typeof loaded !== 'object') return;
             if (typeof loaded.serializedState === 'string') {
                 loaded = JSON.parse(loaded.serializedState);
+            }
+            if (loaded.updatedAt && typeof loaded.updatedAt === 'number') {
+                appState.localUpdatedAt = loaded.updatedAt;
             }
             if (loaded.activeProgramId && TRAINING_PROGRAMS[loaded.activeProgramId]) {
                 appState.activeProgramId = loaded.activeProgramId;
@@ -1507,6 +1527,32 @@
             document.getElementById('btn-connect-drive-text').textContent = connected
                 ? 'Cambiar Cuenta de Google'
                 : (hasSavedAccount ? 'Reanudar Sincronización con Drive' : 'Conectar con Google Drive');
+            updateReconnectBarUI();
+        }
+
+        function updateReconnectBarUI() {
+            const bar = document.getElementById('drive-reconnect-bar');
+            const emailSpan = document.getElementById('reconnect-bar-email');
+            if (!bar) return;
+            const session = getSavedDriveSession();
+            const showBar = !!session.connected && !hasValidDriveToken() && window.location.protocol !== 'file:';
+            bar.classList.toggle('hidden', !showBar);
+            if (emailSpan) {
+                emailSpan.textContent = session.email || 'cuenta guardada';
+            }
+        }
+
+        function handleSyncBadgeClick() {
+            const session = getSavedDriveSession();
+            if (session.connected && !hasValidDriveToken() && window.location.protocol !== 'file:') {
+                reconnectSavedDriveAccount();
+                return;
+            }
+            openDriveModal();
+        }
+
+        function reconnectSavedDriveAccount() {
+            connectGoogleDrive(false, false);
         }
 
         function openDriveModal() {
@@ -1820,14 +1866,22 @@
 
                 const localLogsCount = appState.workoutLogs.length;
                 const remoteLogsCount = (remoteData.workoutLogs || []).length;
+                const remoteUpdatedAt = remoteData.updatedAt || 0;
+                const localUpdatedAt = appState.localUpdatedAt || 0;
 
-                if (forceOverwrite || (localLogsCount === 0 && remoteLogsCount > 0)) {
+                if (forceOverwrite || (localLogsCount === 0 && remoteLogsCount > 0) || (remoteUpdatedAt > localUpdatedAt && remoteLogsCount >= localLogsCount)) {
                     mergeLoadedState(remoteData);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePersistableState()));
+                    const stateToSave = serializePersistableState();
+                    if (remoteUpdatedAt) {
+                        stateToSave.updatedAt = remoteUpdatedAt;
+                        appState.localUpdatedAt = remoteUpdatedAt;
+                    }
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
                     renderAll();
-                    showToast(`Historial cargado desde Drive (${remoteLogsCount} sesiones)`);
+                    showToast(`Datos actualizados desde Drive (${remoteLogsCount} sesiones)`);
                 }
                 setSyncBadge('connected', 'Drive OK');
+                updateReconnectBarUI();
             } catch (err) {
                 console.error('Error leyendo Drive:', err);
                 setSyncBadge('error', 'Error Drive');
