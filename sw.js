@@ -1,5 +1,5 @@
-const CACHE_NAME = 'hypergym-v2';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-512.png'];
+const CACHE_NAME = 'hypergym-v3';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-512.png', './avatars/aaa_1.jpg', './avatars/aaa_2.jpg', './avatars/aaa_3.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

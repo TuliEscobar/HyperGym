@@ -78,9 +78,64 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #0f172a;
+            background-color: #0b1120;
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.11), transparent 38%),
+                radial-gradient(circle at 85% 25%, rgba(56, 189, 248, 0.08), transparent 40%);
             color: #f8fafc;
             overscroll-behavior-y: none;
+        }
+        .avatar-canvas-wrap {
+            background: radial-gradient(circle at 50% 42%, rgba(16, 185, 129, 0.18) 0%, rgba(15, 23, 42, 0.92) 68%, #070b14 100%);
+            touch-action: pan-y;
+        }
+        @keyframes athlete-breathe {
+            0%, 100% { transform: translateY(0px) scale(1.01) rotateY(-4deg); }
+            25% { transform: translateY(-4px) scale(1.028) rotateY(0deg); }
+            50% { transform: translateY(0px) scale(1.015) rotateY(4deg); }
+            75% { transform: translateY(-3px) scale(1.025) rotateY(0deg); }
+        }
+        @keyframes athlete-celebrate-jump {
+            0%   { transform: translateY(0px) scale(1.02, 1.02) rotateY(0deg); filter: brightness(1); }
+            12%  { transform: translateY(6px) scale(1.06, 0.94) rotateY(-8deg); filter: brightness(1.08); }
+            30%  { transform: translateY(-28px) scale(1.09, 1.07) rotateY(14deg); filter: brightness(1.25) drop-shadow(0 0 28px rgba(16, 185, 129, 0.85)); }
+            48%  { transform: translateY(4px) scale(1.05, 0.95) rotateY(-10deg); filter: brightness(1.1); }
+            68%  { transform: translateY(-22px) scale(1.10, 1.08) rotateY(12deg); filter: brightness(1.28) drop-shadow(0 0 30px rgba(245, 158, 11, 0.85)); }
+            86%  { transform: translateY(2px) scale(1.03, 0.98) rotateY(-4deg); filter: brightness(1.05); }
+            100% { transform: translateY(0px) scale(1.01, 1.01) rotateY(0deg); filter: brightness(1); }
+        }
+        @keyframes athlete-levelup-spin {
+            0%   { transform: translateY(0px) scale(1) rotateY(0deg); filter: brightness(1); }
+            15%  { transform: translateY(8px) scale(1.06, 0.92) rotateY(0deg); filter: brightness(1.2); }
+            50%  { transform: translateY(-34px) scale(1.14) rotateY(360deg); filter: brightness(1.45) drop-shadow(0 0 36px rgba(245, 158, 11, 0.95)); }
+            75%  { transform: translateY(-10px) scale(1.08) rotateY(360deg); filter: brightness(1.25) drop-shadow(0 0 26px rgba(16, 185, 129, 0.85)); }
+            100% { transform: translateY(0px) scale(1.02) rotateY(360deg); filter: brightness(1); }
+        }
+        @keyframes shockwave-pulse {
+            0%   { transform: scale(0.35); opacity: 0.95; }
+            100% { transform: scale(1.85); opacity: 0; }
+        }
+        .athlete-idle-anim {
+            animation: athlete-breathe 4.4s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+        .athlete-celebrate-anim {
+            animation: athlete-celebrate-jump 1.35s cubic-bezier(0.22, 1, 0.36, 1) 2;
+            transform-style: preserve-3d;
+        }
+        .athlete-levelup-anim {
+            animation: athlete-levelup-spin 1.8s cubic-bezier(0.22, 1, 0.36, 1) 1;
+            transform-style: preserve-3d;
+        }
+        .shockwave-active {
+            animation: shockwave-pulse 0.9s ease-out 2;
+        }
+        .tilt-stage {
+            perspective: 900px;
+        }
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.14s ease-out;
         }
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -413,6 +468,90 @@
         </section>
 
         <!-- ========================================== -->
+        <!-- PESTAÑA 5: AVATAR 3D AAA (PROGRESO)        -->
+        <!-- ========================================== -->
+        <section id="tab-avatar" class="hidden space-y-4 pb-8">
+            <!-- Cabecera de Nivel y Rango -->
+            <div class="bg-slate-800/80 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-4 space-y-3 shadow-lg">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">Tu Atleta 3D • <span id="avatar-season-label">Ciclo 1</span></span>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <span>Nivel <span id="avatar-level-num" class="text-emerald-400 font-mono">1</span><span class="text-slate-500 text-sm font-mono">/4</span></span>
+                            <span id="avatar-rank-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">Novato</span>
+                        </h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 uppercase block">Progreso Nivel</span>
+                        <span id="avatar-cycle-text" class="font-mono text-sm font-extrabold text-amber-400">0 / 4 días</span>
+                    </div>
+                </div>
+
+                <!-- Barra de progreso 0/4 días -->
+                <div class="space-y-1">
+                    <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-700/70">
+                        <div id="avatar-level-bar" class="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-400">
+                        <span>Cada 4 días subís de nivel • Al terminar Nv. 4 inicia nuevo ciclo</span>
+                        <span id="avatar-total-workouts" class="font-mono text-slate-300">0 sesiones</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Escenario Interactivo 3D AAA -->
+            <div id="avatar-stage-outer" class="relative rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl avatar-canvas-wrap tilt-stage">
+                <div id="avatar-image-stage" class="relative w-full h-[420px] flex items-center justify-center overflow-hidden select-none">
+                    <!-- Aura trasera dinámica -->
+                    <div id="avatar-aura-glow" class="pointer-events-none absolute inset-0 transition-all duration-700 opacity-45" style="background: radial-gradient(circle at 50% 45%, rgba(16,185,129,0.45), transparent 65%);"></div>
+
+                    <!-- Anillo de onda expansiva en festejos -->
+                    <div id="avatar-shockwave" class="pointer-events-none absolute w-48 h-48 rounded-full border-4 border-emerald-400/80 opacity-0"></div>
+
+                    <!-- Personaje 3D AAA con movimiento 3D + Tilt interactivo -->
+                    <div id="avatar-tilt-card" class="tilt-card relative w-full h-full flex items-center justify-center">
+                        <img id="avatar-hero-img" src="./avatars/aaa_1.jpg" alt="Atleta HyperGym 3D" class="w-full h-full object-cover object-top athlete-idle-anim transition-opacity duration-300">
+                        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+                    </div>
+
+                    <!-- Canvas de confeti y partículas de energía 3D -->
+                    <canvas id="avatar-fx-canvas" class="pointer-events-none absolute inset-0 w-full h-full"></canvas>
+                </div>
+
+                <!-- Overlay superior izquierdo -->
+                <div id="avatar-hint-pill" class="pointer-events-none absolute top-3 left-3 bg-slate-950/75 backdrop-blur-md border border-slate-700/70 rounded-full px-2.5 py-1 text-[10px] text-slate-200 font-semibold flex items-center gap-1.5">
+                    <i class="ph-bold ph-sparkle text-emerald-400"></i> <span id="avatar-hint-text">Mové el dedo para efecto 3D</span>
+                </div>
+
+                <!-- Overlay de Festejo / Level Up -->
+                <div id="avatar-celebration-banner" class="pointer-events-none absolute top-3 right-3 opacity-0 transition-all duration-300 translate-y-2 bg-gradient-to-r from-emerald-500 to-amber-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-full shadow-lg">
+                    🎉 ¡ENTRENO COMPLETADO!
+                </div>
+
+                <!-- Stats musculares en vivo -->
+                <div class="pointer-events-none absolute bottom-3 left-3 right-3 grid grid-cols-3 gap-1.5">
+                    <div class="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-xl px-2 py-1.5 text-center">
+                        <span class="text-[9px] uppercase text-slate-400 block">Fuerza</span>
+                        <span id="avatar-stat-str" class="font-mono text-xs font-extrabold text-emerald-400">100%</span>
+                    </div>
+                    <div class="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-xl px-2 py-1.5 text-center">
+                        <span class="text-[9px] uppercase text-slate-400 block">Hipertrofia</span>
+                        <span id="avatar-stat-hyp" class="font-mono text-xs font-extrabold text-amber-400">Nv. 1</span>
+                    </div>
+                    <div class="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-xl px-2 py-1.5 text-center">
+                        <span class="text-[9px] uppercase text-slate-400 block">Mancuernas</span>
+                        <span id="avatar-stat-db" class="font-mono text-xs font-extrabold text-sky-400">10 kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón sutil para repetir animación de festejo -->
+            <button onclick="triggerAvatarCelebration(false, false)" class="w-full py-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition">
+                <i class="ph-bold ph-confetti text-base"></i> Repetir Festejo del Atleta
+            </button>
+        </section>
+
+        <!-- ========================================== -->
         <!-- PESTAÑA 4: PROGRAMAS Y CALENDARIO          -->
         <!-- ========================================== -->
         <section id="tab-calendario" class="hidden space-y-4 pb-8">
@@ -740,7 +879,7 @@
                 </div>
             </div>
 
-            <!-- Foto opcional post-entreno -->
+            <!-- Foto opcional post-entreno (Cámara o Galería) -->
             <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3 space-y-2.5 text-left">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
@@ -752,22 +891,34 @@
                 <div id="celebration-photo-preview-wrap" class="hidden">
                     <img id="celebration-photo-preview" src="" alt="Foto del entrenamiento" class="w-full max-h-44 object-cover rounded-xl border border-emerald-500/40">
                 </div>
-                <label id="celebration-photo-btn" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-950 border border-dashed border-slate-600 text-xs font-bold text-emerald-300 flex items-center justify-center gap-2 cursor-pointer transition active:scale-95">
-                    <i class="ph-bold ph-camera-plus text-base"></i>
-                    <span>Tomar o subir foto del progreso</span>
-                    <input id="celebration-photo-input" type="file" accept="image/*" capture="environment" onchange="handleCelebrationPhotoSelect(event)" class="hidden">
-                </label>
+                <div id="celebration-photo-btn" class="grid grid-cols-2 gap-2">
+                    <label class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-950 border border-dashed border-emerald-500/50 text-xs font-bold text-emerald-300 flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95">
+                        <i class="ph-bold ph-camera text-base"></i>
+                        <span>Cámara</span>
+                        <input id="celebration-photo-camera" type="file" accept="image/*" capture="environment" onchange="handleCelebrationPhotoSelect(event)" class="sr-only">
+                    </label>
+                    <label class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-950 border border-dashed border-sky-500/50 text-xs font-bold text-sky-300 flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-95">
+                        <i class="ph-bold ph-images text-base"></i>
+                        <span>Galería</span>
+                        <input id="celebration-photo-gallery" type="file" accept="image/*" onchange="handleCelebrationPhotoSelect(event)" class="sr-only">
+                    </label>
+                </div>
             </div>
 
             <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left flex items-center gap-2.5">
                 <i class="ph-fill ph-lightning text-amber-400 text-2xl shrink-0"></i>
                 <p id="celebration-tip" class="text-[11px] text-amber-200 leading-tight">
-                    <strong>Post-Entreno:</strong> Hidratate bien y registrá tu comida o batido proteico en la pestaña Combustible.
+                    <strong>Post-Entreno:</strong> Tu atleta 3D ya festejó este entrenamiento. ¡Mirá tu progreso en la pestaña Avatar!
                 </p>
             </div>
-            <button onclick="closeCelebrationModal()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-sm">
-                Ir a Combustible
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="closeCelebrationModal('avatar')" class="py-3.5 rounded-2xl bg-slate-800 border border-emerald-500/40 text-emerald-300 font-extrabold text-xs">
+                    Ver Festejo 3D 🎉
+                </button>
+                <button onclick="closeCelebrationModal('combustible')" class="py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                    Ir a Combustible
+                </button>
+            </div>
         </div>
     </div>
 
@@ -786,8 +937,8 @@
         </div>
     </div>
 
-    <!-- Input oculto para agregar foto a una sesión del historial -->
-    <input id="history-photo-input" type="file" accept="image/*" onchange="handleHistoryPhotoSelect(event)" class="hidden">
+    <!-- Input accesible (no display:none) para agregar/cambiar foto en historial -->
+    <input id="history-photo-input" type="file" accept="image/*" onchange="handleHistoryPhotoSelect(event)" class="sr-only">
 
     <!-- ========================================== -->
     <!-- BOTÓN ESTILO GLOBO: INSTALAR APP EN CELU   -->
@@ -858,22 +1009,26 @@
     <!-- NAVEGACIÓN INFERIOR (BOTTOM BAR)           -->
     <!-- ========================================== -->
     <nav class="fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800">
-        <div class="max-w-md mx-auto grid grid-cols-4 px-2 py-1.5">
+        <div class="max-w-md mx-auto grid grid-cols-5 px-1.5 py-1.5">
             <button onclick="switchTab('entrenar')" id="nav-entrenar" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 transition">
                 <i class="ph-fill ph-barbell text-xl"></i>
-                <span class="text-[11px] font-bold mt-0.5">Entrenar</span>
+                <span class="text-[10px] font-bold mt-0.5">Entrenar</span>
             </button>
             <button onclick="switchTab('combustible')" id="nav-combustible" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
                 <i class="ph-fill ph-fire text-xl"></i>
-                <span class="text-[11px] font-medium mt-0.5">Combustible</span>
+                <span class="text-[10px] font-medium mt-0.5">Nutrición</span>
+            </button>
+            <button onclick="switchTab('avatar')" id="nav-avatar" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                <i class="ph-fill ph-person-arms-spread text-xl"></i>
+                <span class="text-[10px] font-medium mt-0.5">Avatar 3D</span>
             </button>
             <button onclick="switchTab('historial')" id="nav-historial" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
                 <i class="ph-fill ph-chart-line-up text-xl"></i>
-                <span class="text-[11px] font-medium mt-0.5">Métricas</span>
+                <span class="text-[10px] font-medium mt-0.5">Métricas</span>
             </button>
             <button onclick="switchTab('calendario')" id="nav-calendario" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition">
                 <i class="ph-fill ph-calendar-blank text-xl"></i>
-                <span class="text-[11px] font-medium mt-0.5">Programas</span>
+                <span class="text-[10px] font-medium mt-0.5">Programas</span>
             </button>
         </div>
     </nav>
@@ -1370,7 +1525,10 @@
                 appState.ghostHistory = loaded.ghostHistory;
             }
             if (Array.isArray(loaded.workoutLogs)) {
-                appState.workoutLogs = loaded.workoutLogs;
+                appState.workoutLogs = loaded.workoutLogs.map((l, idx) => ({
+                    ...l,
+                    id: l.id || ('log_legacy_' + idx + '_' + Date.now())
+                }));
             }
             if (Array.isArray(loaded.weightHistory) && loaded.weightHistory.length) {
                 appState.weightHistory = loaded.weightHistory;
@@ -2602,6 +2760,10 @@
             lastSavedLogId = newLogId;
             resetCelebrationPhotoUI();
 
+            // Marcar festejo del avatar 3D (y si completó ciclo de 4 días -> Level Up!)
+            const totalNow = appState.workoutLogs.length;
+            pendingAvatarCelebration = { isLevelUp: (totalNow % 4 === 0) };
+
             stopTimer();
             saveAppState(true);
             renderAll();
@@ -2616,28 +2778,54 @@
 
         let lastSavedLogId = null;
         let pendingPhotoLogId = null;
+        let pendingAvatarCelebration = null; // { isLevelUp: boolean }
 
         function resetCelebrationPhotoUI() {
             const wrap = document.getElementById('celebration-photo-preview-wrap');
             const img = document.getElementById('celebration-photo-preview');
             const rem = document.getElementById('celebration-photo-remove');
             const btn = document.getElementById('celebration-photo-btn');
-            const inp = document.getElementById('celebration-photo-input');
+            const cam = document.getElementById('celebration-photo-camera');
+            const gal = document.getElementById('celebration-photo-gallery');
             if (wrap) wrap.classList.add('hidden');
             if (img) img.src = '';
             if (rem) rem.classList.add('hidden');
             if (btn) btn.classList.remove('hidden');
-            if (inp) inp.value = '';
+            if (cam) cam.value = '';
+            if (gal) gal.value = '';
         }
 
-        function compressImageToDataUrl(file, maxWidth = 720, quality = 0.72) {
+        async function compressImageToDataUrl(file, maxWidth = 720, quality = 0.72) {
+            // Método 1: createImageBitmap (rápido y eficiente en memoria para fotos grandes de celular)
+            if (typeof createImageBitmap === 'function') {
+                try {
+                    const bitmap = await createImageBitmap(file);
+                    let w = bitmap.width;
+                    let h = bitmap.height;
+                    if (w > maxWidth) {
+                        h = Math.round((h * maxWidth) / w);
+                        w = maxWidth;
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(bitmap, 0, 0, w, h);
+                    if (bitmap.close) bitmap.close();
+                    return canvas.toDataURL('image/jpeg', quality);
+                } catch (e) {
+                    console.warn('createImageBitmap fallback:', e);
+                }
+            }
+
+            // Método 2: ObjectURL -> Image -> Canvas (evita convertir 15MB a Base64 antes de redimensionar)
             return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let w = img.width;
-                        let h = img.height;
+                const objUrl = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        let w = img.naturalWidth || img.width;
+                        let h = img.naturalHeight || img.height;
                         if (w > maxWidth) {
                             h = Math.round((h * maxWidth) / w);
                             w = maxWidth;
@@ -2647,40 +2835,56 @@
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
+                        URL.revokeObjectURL(objUrl);
                         resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = reject;
-                    img.src = ev.target.result;
+                    } catch (err) {
+                        URL.revokeObjectURL(objUrl);
+                        reject(err);
+                    }
                 };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
+                img.onerror = (err) => {
+                    URL.revokeObjectURL(objUrl);
+                    reject(err);
+                };
+                img.src = objUrl;
             });
         }
 
         async function attachPhotoToLog(logId, file) {
             if (!logId || !file) return null;
             const log = appState.workoutLogs.find(l => l.id === logId);
-            if (!log) return null;
+            if (!log) {
+                showToast('No se encontró la sesión para guardar la foto');
+                return null;
+            }
             try {
                 const dataUrl = await compressImageToDataUrl(file, 720, 0.72);
                 log.photoDataUrl = dataUrl;
-                saveAppState(true);
-                renderHistoryTab();
-                if (driveAccessToken) {
-                    const safeTitle = (log.title || 'entreno').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 24);
-                    uploadPhotoToGoogleDrive(dataUrl, `${log.isoDate || getTodayDateKey()}_${safeTitle}.jpg`);
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePersistableState()));
+                } catch (storageErr) {
+                    // Si localStorage está lleno, comprimimos un poco más
+                    const smaller = await compressImageToDataUrl(file, 480, 0.55);
+                    log.photoDataUrl = smaller;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePersistableState()));
                 }
+                if (hasValidDriveToken()) {
+                    const safeTitle = (log.title || 'entreno').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 24);
+                    uploadPhotoToGoogleDrive(log.photoDataUrl, `${log.isoDate || getTodayDateKey()}_${safeTitle}.jpg`);
+                    syncToGoogleDrive(false);
+                }
+                renderHistoryTab();
                 showToast('📸 Foto guardada junto al entrenamiento');
-                return dataUrl;
+                return log.photoDataUrl;
             } catch (err) {
                 console.error('Error procesando foto:', err);
-                showToast('No se pudo procesar la foto');
+                showToast('Formato de foto no soportado o archivo muy pesado');
                 return null;
             }
         }
 
         async function handleCelebrationPhotoSelect(event) {
-            const file = event.target.files[0];
+            const file = event.target.files && event.target.files[0];
             if (!file || !lastSavedLogId) return;
             const dataUrl = await attachPhotoToLog(lastSavedLogId, file);
             if (dataUrl) {
@@ -2689,6 +2893,7 @@
                 document.getElementById('celebration-photo-remove').classList.remove('hidden');
                 document.getElementById('celebration-photo-btn').classList.add('hidden');
             }
+            event.target.value = '';
         }
 
         function removeCelebrationPhoto() {
@@ -2712,7 +2917,7 @@
         }
 
         async function handleHistoryPhotoSelect(event) {
-            const file = event.target.files[0];
+            const file = event.target.files && event.target.files[0];
             if (!file || !pendingPhotoLogId) return;
             await attachPhotoToLog(pendingPhotoLogId, file);
             pendingPhotoLogId = null;
@@ -2735,11 +2940,11 @@
             m.classList.remove('flex');
         }
 
-        function closeCelebrationModal() {
+        function closeCelebrationModal(targetTab = 'combustible') {
             const modal = document.getElementById('modal-celebration');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            switchTab('combustible');
+            switchTab(targetTab);
         }
 
         // ----------------------------------------------------
@@ -3475,11 +3680,607 @@
         }
 
         // ----------------------------------------------------
+        // 9B. AVATAR 3D INTERACTIVO (THREE.JS + NIVELES + FESTEJO)
+        // ----------------------------------------------------
+        let avatarPreviewExtraWorkouts = 0;
+        let avatarScene = null;
+        let avatarCamera = null;
+        let avatarRenderer = null;
+        let avatarRoot = null;
+        let avatarParts = null;
+        let avatarRing = null;
+        let avatarAuraRing = null;
+        let avatarConfetti = [];
+        let avatarAnimId = null;
+        let avatarIsCelebrating = false;
+        let avatarCelebrateTime = 0;
+        let avatarCelebrateIsLevelUp = false;
+        let avatarDragActive = false;
+        let avatarLastPointerX = 0;
+        let avatarTargetRotY = 0.25;
+
+        const AVATAR_RANKS = [
+            'Novato', 'Constante', 'Atlético', 'Hipertrofia', 'Fuerza Pro',
+            'Bestia Gym', 'Titán', 'Coloso', 'Leyenda', 'Mítico'
+        ];
+
+        function getAvatarWorkoutCount() {
+            return (appState.workoutLogs.length || 0) + avatarPreviewExtraWorkouts;
+        }
+
+        function getAvatarStats() {
+            const total = Math.max(0, getAvatarWorkoutCount());
+            const totalLevelsCompleted = Math.floor(total / 4);
+            // Ciclo de Niveles 1 -> 2 -> 3 -> 4 -> vuelve a Nivel 1 (Ciclo 2, 3...)
+            const level = (totalLevelsCompleted % 4) + 1;
+            const season = Math.floor(totalLevelsCompleted / 4) + 1;
+            const cycleProgress = total % 4;
+            const ranks = ['Novato', 'Atlético', 'Hipertrofia', 'Titán'];
+            const rank = ranks[level - 1];
+            const strengthPct = 100 + (level - 1) * 20 + cycleProgress * 5;
+            const dbKg = 10 + (level - 1) * 6;
+            return { total, level, season, cycleProgress, rank, strengthPct, dbKg };
+        }
+
+        let avatarStyleMode = 'aaa';
+        let avatarFxParticles = [];
+        let avatarFxAnimId = null;
+        let avatarTiltBound = false;
+
+        const AVATAR_AAA_IMAGES = [
+            './avatars/aaa_1.jpg',
+            './avatars/aaa_2.jpg',
+            './avatars/aaa_3.jpg',
+            './avatars/aaa_3.jpg'
+        ];
+
+        function initAvatarImageFX() {
+            const stage = document.getElementById('avatar-image-stage');
+            const card = document.getElementById('avatar-tilt-card');
+            if (!stage || !card || avatarTiltBound) return;
+            avatarTiltBound = true;
+
+            const applyTilt = (clientX, clientY) => {
+                const rect = stage.getBoundingClientRect();
+                const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+                const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
+                card.style.transform = `rotateY(${(nx * 14).toFixed(2)}deg) rotateX(${(-ny * 10).toFixed(2)}deg) scale(1.03)`;
+            };
+            const resetTilt = () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+            };
+
+            stage.addEventListener('mousemove', (e) => applyTilt(e.clientX, e.clientY));
+            stage.addEventListener('mouseleave', resetTilt);
+            stage.addEventListener('touchmove', (e) => { if (e.touches[0]) applyTilt(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+            stage.addEventListener('touchend', resetTilt);
+        }
+
+        function spawn2DCelebrationFX(isLevelUp) {
+            const canvas = document.getElementById('avatar-fx-canvas');
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width || 360;
+            canvas.height = rect.height || 420;
+            const ctx = canvas.getContext('2d');
+
+            const colors = isLevelUp ? ['#f59e0b', '#10b981', '#fef08a', '#38bdf8', '#ffffff'] : ['#10b981', '#34d399', '#f59e0b'];
+            const count = isLevelUp ? 85 : 46;
+            avatarFxParticles = [];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2.8 + Math.random() * 6.8;
+                avatarFxParticles.push({
+                    x: canvas.width * 0.5,
+                    y: canvas.height * 0.44,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 4.0,
+                    size: 4 + Math.random() * 6,
+                    color: colors[i % colors.length],
+                    rot: Math.random() * Math.PI,
+                    vrot: (Math.random() - 0.5) * 0.28,
+                    life: 1.0
+                });
+            }
+
+            // Animación dinámica del personaje (salto + giro 3D al subir nivel)
+            const heroImg = document.getElementById('avatar-hero-img');
+            const shockwave = document.getElementById('avatar-shockwave');
+            if (heroImg) {
+                heroImg.classList.remove('athlete-idle-anim', 'athlete-celebrate-anim', 'athlete-levelup-anim');
+                void heroImg.offsetWidth;
+                const animClass = isLevelUp ? 'athlete-levelup-anim' : 'athlete-celebrate-anim';
+                heroImg.classList.add(animClass);
+                setTimeout(() => {
+                    heroImg.classList.remove('athlete-celebrate-anim', 'athlete-levelup-anim');
+                    heroImg.classList.add('athlete-idle-anim');
+                }, isLevelUp ? 1900 : 2750);
+            }
+            if (shockwave) {
+                shockwave.classList.remove('shockwave-active');
+                void shockwave.offsetWidth;
+                shockwave.style.borderColor = isLevelUp ? 'rgba(245, 158, 11, 0.9)' : 'rgba(16, 185, 129, 0.85)';
+                shockwave.classList.add('shockwave-active');
+            }
+
+            if (avatarFxAnimId) cancelAnimationFrame(avatarFxAnimId);
+            function step() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = 0;
+                avatarFxParticles.forEach(p => {
+                    if (p.life <= 0) return;
+                    alive++;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.16;
+                    p.rot += p.vrot;
+                    p.life -= 0.013;
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.life);
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                    ctx.restore();
+                });
+                if (alive > 0) {
+                    avatarFxAnimId = requestAnimationFrame(step);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const banner = document.getElementById('avatar-celebration-banner');
+                    if (banner) banner.classList.add('opacity-0', 'translate-y-2');
+                }
+            }
+            step();
+        }
+
+        function renderAvatarHUD() {
+            const st = getAvatarStats();
+            const lvlEl = document.getElementById('avatar-level-num');
+            if (!lvlEl) return;
+            lvlEl.textContent = st.level;
+            const seasonEl = document.getElementById('avatar-season-label');
+            if (seasonEl) seasonEl.textContent = `Ciclo ${st.season}`;
+            document.getElementById('avatar-rank-badge').textContent = st.rank;
+            document.getElementById('avatar-cycle-text').textContent = `${st.cycleProgress} / 4 días`;
+            document.getElementById('avatar-level-bar').style.width = `${(st.cycleProgress / 4) * 100}%`;
+            document.getElementById('avatar-total-workouts').textContent = `${st.total} sesiones`;
+            document.getElementById('avatar-stat-str').textContent = `${st.strengthPct}%`;
+            document.getElementById('avatar-stat-hyp').textContent = `Nv. ${st.level}`;
+            document.getElementById('avatar-stat-db').textContent = `${st.dbKg} kg`;
+
+            const imgEl = document.getElementById('avatar-hero-img');
+            const auraEl = document.getElementById('avatar-aura-glow');
+            if (imgEl) {
+                const nextSrc = AVATAR_AAA_IMAGES[st.level - 1] || AVATAR_AAA_IMAGES[0];
+                if (!imgEl.getAttribute('src') || !imgEl.getAttribute('src').endsWith(nextSrc.replace('./', ''))) {
+                    imgEl.style.opacity = '0.35';
+                    setTimeout(() => {
+                        imgEl.src = nextSrc;
+                        imgEl.style.opacity = '1';
+                    }, 120);
+                }
+                if (auraEl) {
+                    const isMax = st.level === 4;
+                    auraEl.style.opacity = String(Math.min(0.9, 0.30 + (st.level - 1) * 0.20));
+                    auraEl.style.background = isMax
+                        ? 'radial-gradient(circle at 50% 42%, rgba(245,158,11,0.62), rgba(16,185,129,0.28) 48%, transparent 72%)'
+                        : 'radial-gradient(circle at 50% 42%, rgba(16,185,129,0.48), transparent 68%)';
+                }
+            }
+        }
+
+        function applyAvatarMusculature(level) {
+            if (!avatarParts) return;
+            // Crecimiento muscular progresivo y claramente visible por nivel (hasta nivel 12)
+            const g = Math.min(level - 1, 11);
+            const chestX = 1 + g * 0.085;
+            const chestZ = 1 + g * 0.075;
+            const deltScale = 1 + g * 0.11;
+            const armScale = 1 + g * 0.10;
+            const legScale = 1 + g * 0.075;
+            const dbScale = 1 + g * 0.12;
+            const shoulderOffset = 0.56 + g * 0.032;
+
+            avatarParts.chest.scale.set(chestX, 1 + g * 0.03, chestZ);
+            avatarParts.pecsL.scale.set(1 + g * 0.11, 1 + g * 0.09, 1 + g * 0.12);
+            avatarParts.pecsR.scale.set(1 + g * 0.11, 1 + g * 0.09, 1 + g * 0.12);
+            avatarParts.abs.scale.set(1 + g * 0.04, 1, 1 + g * 0.05);
+
+            avatarParts.armPivotL.position.x = -shoulderOffset;
+            avatarParts.armPivotR.position.x = shoulderOffset;
+            avatarParts.deltL.scale.set(deltScale, deltScale, deltScale);
+            avatarParts.deltR.scale.set(deltScale, deltScale, deltScale);
+            avatarParts.bicepL.scale.set(armScale, 1, armScale);
+            avatarParts.bicepR.scale.set(armScale, 1, armScale);
+            avatarParts.forearmL.scale.set(1 + g * 0.07, 1, 1 + g * 0.07);
+            avatarParts.forearmR.scale.set(1 + g * 0.07, 1, 1 + g * 0.07);
+
+            avatarParts.quadL.scale.set(legScale, 1, legScale);
+            avatarParts.quadR.scale.set(legScale, 1, legScale);
+            avatarParts.calfL.scale.set(1 + g * 0.06, 1, 1 + g * 0.06);
+            avatarParts.calfR.scale.set(1 + g * 0.06, 1, 1 + g * 0.06);
+
+            avatarParts.dbL.scale.set(dbScale, dbScale, dbScale);
+            avatarParts.dbR.scale.set(dbScale, dbScale, dbScale);
+
+            // Aura dorada visible a partir de Nivel 3
+            if (avatarAuraRing) {
+                avatarAuraRing.visible = level >= 2;
+                const auraMat = avatarAuraRing.material;
+                auraMat.color.setHex(level >= 4 ? 0xf59e0b : 0x10b981);
+                auraMat.opacity = Math.min(0.85, 0.25 + g * 0.08);
+            }
+        }
+
+        function initAvatar3DScene() {
+            const container = document.getElementById('avatar-3d-container');
+            if (!container || typeof THREE === 'undefined') return;
+
+            if (avatarRenderer) {
+                resizeAvatar3D();
+                return;
+            }
+
+            const width = container.clientWidth || 340;
+            const height = container.clientHeight || 320;
+
+            avatarScene = new THREE.Scene();
+            avatarCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+            avatarCamera.position.set(0, 1.55, 4.9);
+            avatarCamera.lookAt(0, 1.15, 0);
+
+            avatarRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            avatarRenderer.setSize(width, height);
+            avatarRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            container.innerHTML = '';
+            container.appendChild(avatarRenderer.domElement);
+
+            // Iluminación moderna estilo estudio fitness neon
+            const ambient = new THREE.AmbientLight(0xffffff, 0.72);
+            avatarScene.add(ambient);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+            keyLight.position.set(3, 6, 5);
+            avatarScene.add(keyLight);
+
+            const rimEmerald = new THREE.PointLight(0x10b981, 2.0, 10);
+            rimEmerald.position.set(-2.5, 2.5, -1.8);
+            avatarScene.add(rimEmerald);
+
+            const rimAmber = new THREE.PointLight(0xf59e0b, 1.1, 10);
+            rimAmber.position.set(2.5, 1.8, -1.5);
+            avatarScene.add(rimAmber);
+
+            // Podio neón
+            const podiumGeo = new THREE.CylinderGeometry(1.15, 1.32, 0.18, 36);
+            const podiumMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.55, roughness: 0.35 });
+            const podium = new THREE.Mesh(podiumGeo, podiumMat);
+            podium.position.y = -0.09;
+            avatarScene.add(podium);
+
+            const ringGeo = new THREE.TorusGeometry(1.18, 0.032, 12, 48);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+            avatarRing = new THREE.Mesh(ringGeo, ringMat);
+            avatarRing.rotation.x = Math.PI / 2;
+            avatarRing.position.y = 0.01;
+            avatarScene.add(avatarRing);
+
+            const auraGeo = new THREE.TorusGeometry(0.95, 0.02, 10, 48);
+            const auraMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.35 });
+            avatarAuraRing = new THREE.Mesh(auraGeo, auraMat);
+            avatarAuraRing.rotation.x = Math.PI / 2;
+            avatarAuraRing.position.y = 1.25;
+            avatarAuraRing.visible = false;
+            avatarScene.add(avatarAuraRing);
+
+            // Materiales del personaje
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xf1c29b, roughness: 0.55, metalness: 0.05 });
+            const tankMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.45, metalness: 0.2 });
+            const accentMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.3, metalness: 0.25, emissive: 0x052e22 });
+            const shortsMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 });
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0x1e1b18, roughness: 0.8 });
+            const shoeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
+            const metalMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.25 });
+            const plateMat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.5, roughness: 0.3 });
+
+            avatarRoot = new THREE.Group();
+            avatarScene.add(avatarRoot);
+
+            // Piernas
+            const legGroupL = new THREE.Group();
+            legGroupL.position.set(-0.22, 0.92, 0);
+            const legGroupR = new THREE.Group();
+            legGroupR.position.set(0.22, 0.92, 0);
+
+            function buildLeg(parent) {
+                const quad = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 0.48, 16), skinMat);
+                quad.position.y = -0.24;
+                parent.add(quad);
+
+                const shortLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.165, 0.155, 0.28, 16), shortsMat);
+                shortLeg.position.y = -0.11;
+                parent.add(shortLeg);
+
+                const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.085, 0.42, 16), skinMat);
+                calf.position.y = -0.66;
+                parent.add(calf);
+
+                const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.11, 0.32), shoeMat);
+                shoe.position.set(0, -0.87, 0.05);
+                parent.add(shoe);
+
+                return { quad, calf };
+            }
+            const legL = buildLeg(legGroupL);
+            const legR = buildLeg(legGroupR);
+            avatarRoot.add(legGroupL, legGroupR);
+
+            // Pelvis / Shorts
+            const pelvis = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.22, 0.32), shortsMat);
+            pelvis.position.y = 0.95;
+            avatarRoot.add(pelvis);
+
+            // Abdomen / Core
+            const abs = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.25, 0.34, 18), tankMat);
+            abs.position.y = 1.22;
+            avatarRoot.add(abs);
+
+            // Pecho / Torso superior (V-taper)
+            const chest = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.28, 0.46, 20), tankMat);
+            chest.position.y = 1.56;
+            avatarRoot.add(chest);
+
+            // Pectorales esculpidos (crecen con el nivel)
+            const pecGeo = new THREE.SphereGeometry(0.17, 16, 14);
+            const pecsL = new THREE.Mesh(pecGeo, tankMat);
+            pecsL.position.set(-0.15, 1.60, 0.21);
+            pecsL.scale.set(1.1, 0.85, 0.65);
+            const pecsR = new THREE.Mesh(pecGeo, tankMat);
+            pecsR.position.set(0.15, 1.60, 0.21);
+            pecsR.scale.set(1.1, 0.85, 0.65);
+            avatarRoot.add(pecsL, pecsR);
+
+            // Emblema esmeralda en la camiseta
+            const logoPatch = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 0.04), accentMat);
+            logoPatch.position.set(0, 1.58, 0.34);
+            avatarRoot.add(logoPatch);
+
+            // Cuello y Cabeza
+            const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.14, 14), skinMat);
+            neck.position.y = 1.84;
+            avatarRoot.add(neck);
+
+            const headGroup = new THREE.Group();
+            headGroup.position.y = 2.08;
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 22, 20), skinMat);
+            headGroup.add(head);
+
+            // Pelo estilizado
+            const hair = new THREE.Mesh(new THREE.SphereGeometry(0.25, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.52), hairMat);
+            hair.position.y = 0.03;
+            headGroup.add(hair);
+
+            // Vincha deportiva verde esmeralda
+            const headband = new THREE.Mesh(new THREE.TorusGeometry(0.232, 0.032, 10, 28), accentMat);
+            headband.rotation.x = Math.PI / 2;
+            headband.position.y = 0.07;
+            headGroup.add(headband);
+
+            // Ojos
+            const eyeGeo = new THREE.SphereGeometry(0.028, 10, 10);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+            const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+            eyeL.position.set(-0.08, 0.01, 0.215);
+            const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+            eyeR.position.set(0.08, 0.01, 0.215);
+            headGroup.add(eyeL, eyeR);
+
+            avatarRoot.add(headGroup);
+
+            // Brazos + Mancuernas
+            function buildArm(side) {
+                const pivot = new THREE.Group();
+                pivot.position.set(side * 0.56, 1.72, 0);
+
+                const delt = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 14), skinMat);
+                pivot.add(delt);
+
+                const bicep = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.10, 0.34, 14), skinMat);
+                bicep.position.y = -0.22;
+                pivot.add(bicep);
+
+                const elbow = new THREE.Group();
+                elbow.position.y = -0.39;
+                pivot.add(elbow);
+
+                const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.078, 0.32, 14), skinMat);
+                forearm.position.y = -0.16;
+                elbow.add(forearm);
+
+                const fist = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 12), skinMat);
+                fist.position.y = -0.34;
+                elbow.add(fist);
+
+                // Mancuerna en la mano
+                const db = new THREE.Group();
+                db.position.set(0, -0.35, 0.04);
+                const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.28, 10), metalMat);
+                handle.rotation.x = Math.PI / 2;
+                db.add(handle);
+                const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.055, 6), plateMat);
+                p1.rotation.x = Math.PI / 2;
+                p1.position.z = 0.11;
+                const p2 = p1.clone();
+                p2.position.z = -0.11;
+                db.add(p1, p2);
+                elbow.add(db);
+
+                avatarRoot.add(pivot);
+                return { pivot, delt, bicep, elbow, forearm, db };
+            }
+
+            const armL = buildArm(-1);
+            const armR = buildArm(1);
+
+            avatarParts = {
+                chest, pecsL, pecsR, abs, headGroup,
+                armPivotL: armL.pivot, armPivotR: armR.pivot,
+                elbowL: armL.elbow, elbowR: armR.elbow,
+                deltL: armL.delt, deltR: armR.delt,
+                bicepL: armL.bicep, bicepR: armR.bicep,
+                forearmL: armL.forearm, forearmR: armR.forearm,
+                dbL: armL.db, dbR: armR.db,
+                quadL: legL.quad, quadR: legR.quad,
+                calfL: legL.calf, calfR: legR.calf
+            };
+
+            // Drag para rotar 360° con dedo o mouse
+            const dom = avatarRenderer.domElement;
+            const onDown = (x) => { avatarDragActive = true; avatarLastPointerX = x; };
+            const onMove = (x) => {
+                if (!avatarDragActive) return;
+                avatarTargetRotY += (x - avatarLastPointerX) * 0.012;
+                avatarLastPointerX = x;
+            };
+            const onUp = () => { avatarDragActive = false; };
+
+            dom.addEventListener('mousedown', (e) => onDown(e.clientX));
+            window.addEventListener('mousemove', (e) => onMove(e.clientX));
+            window.addEventListener('mouseup', onUp);
+            dom.addEventListener('touchstart', (e) => { if (e.touches[0]) onDown(e.touches[0].clientX); }, { passive: true });
+            dom.addEventListener('touchmove', (e) => { if (e.touches[0]) onMove(e.touches[0].clientX); }, { passive: true });
+            dom.addEventListener('touchend', onUp);
+
+            applyAvatarMusculature(getAvatarStats().level);
+
+            const clock = new THREE.Clock();
+            function animate() {
+                avatarAnimId = requestAnimationFrame(animate);
+                const dt = Math.min(0.05, clock.getDelta());
+                const t = clock.elapsedTime;
+
+                if (!avatarDragActive && !avatarIsCelebrating) {
+                    avatarTargetRotY += dt * 0.35;
+                }
+                avatarRoot.rotation.y += (avatarTargetRotY - avatarRoot.rotation.y) * 0.12;
+                if (avatarRing) avatarRing.rotation.z = t * 0.6;
+                if (avatarAuraRing && avatarAuraRing.visible) {
+                    avatarAuraRing.position.y = 1.25 + Math.sin(t * 2.5) * 0.25;
+                    avatarAuraRing.rotation.z = -t * 1.4;
+                }
+
+                if (avatarIsCelebrating) {
+                    avatarCelebrateTime += dt;
+                    const dur = avatarCelebrateIsLevelUp ? 3.2 : 2.2;
+                    const p = Math.min(1, avatarCelebrateTime / dur);
+
+                    // Salto + doble bíceps victorioso!
+                    const jump = Math.abs(Math.sin(avatarCelebrateTime * 7.5)) * 0.34 * (1 - p * 0.5);
+                    avatarRoot.position.y = jump;
+                    avatarParts.armPivotL.rotation.z = -2.15 - Math.sin(avatarCelebrateTime * 12) * 0.18;
+                    avatarParts.armPivotR.rotation.z = 2.15 + Math.sin(avatarCelebrateTime * 12) * 0.18;
+                    avatarParts.elbowL.rotation.z = -0.95;
+                    avatarParts.elbowR.rotation.z = 0.95;
+                    if (avatarCelebrateIsLevelUp) {
+                        avatarTargetRotY += dt * 4.2;
+                    }
+
+                    // Actualizar confeti 3D
+                    avatarConfetti.forEach(c => {
+                        c.mesh.position.addScaledVector(c.vel, dt);
+                        c.vel.y -= 4.5 * dt;
+                        c.mesh.rotation.x += c.spin * dt;
+                        c.mesh.rotation.y += c.spin * dt;
+                    });
+
+                    if (avatarCelebrateTime >= dur) {
+                        avatarIsCelebrating = false;
+                        avatarRoot.position.y = 0;
+                        avatarConfetti.forEach(c => avatarScene.remove(c.mesh));
+                        avatarConfetti = [];
+                        const banner = document.getElementById('avatar-celebration-banner');
+                        if (banner) {
+                            banner.classList.add('opacity-0', 'translate-y-2');
+                        }
+                    }
+                } else {
+                    // Respiración y pose atlética idle
+                    const breath = Math.sin(t * 2.2) * 0.025;
+                    avatarRoot.position.y = breath;
+                    avatarParts.armPivotL.rotation.z = -0.18 + Math.sin(t * 2.2) * 0.04;
+                    avatarParts.armPivotR.rotation.z = 0.18 - Math.sin(t * 2.2) * 0.04;
+                    avatarParts.elbowL.rotation.z = -0.22;
+                    avatarParts.elbowR.rotation.z = 0.22;
+                    avatarParts.elbowL.rotation.x = -0.35;
+                    avatarParts.elbowR.rotation.x = -0.35;
+                }
+
+                avatarRenderer.render(avatarScene, avatarCamera);
+            }
+            animate();
+        }
+
+        function resizeAvatar3D() {
+            const container = document.getElementById('avatar-3d-container');
+            if (!container || !avatarRenderer || !avatarCamera) return;
+            const w = container.clientWidth || 340;
+            const h = container.clientHeight || 320;
+            avatarCamera.aspect = w / h;
+            avatarCamera.updateProjectionMatrix();
+            avatarRenderer.setSize(w, h);
+        }
+
+        function triggerAvatarCelebration(isLevelUp = false, newSeason = false) {
+            const st = getAvatarStats();
+            const banner = document.getElementById('avatar-celebration-banner');
+            if (banner) {
+                banner.textContent = newSeason
+                    ? `🔄 ¡CICLO ${st.season}! Volvés a Nivel 1`
+                    : (isLevelUp
+                        ? `🏆 ¡SUBISTE A NIVEL ${st.level}! (+Músculo)`
+                        : '🎉 ¡ENTRENO COMPLETADO!');
+                banner.classList.remove('opacity-0', 'translate-y-2');
+            }
+
+            spawn2DCelebrationFX(isLevelUp);
+
+            try {
+                const synth = new Tone.Synth().toDestination();
+                const now = Tone.now();
+                if (isLevelUp) {
+                    synth.triggerAttackRelease("C5", "16n", now);
+                    synth.triggerAttackRelease("E5", "16n", now + 0.1);
+                    synth.triggerAttackRelease("G5", "16n", now + 0.2);
+                    synth.triggerAttackRelease("C6", "4n", now + 0.32);
+                } else {
+                    synth.triggerAttackRelease("E5", "16n", now);
+                    synth.triggerAttackRelease("G5", "8n", now + 0.12);
+                }
+            } catch (e) {}
+        }
+
+        function simulateAvatarWorkout(daysToAdd) {
+            const prev = getAvatarStats();
+            avatarPreviewExtraWorkouts += daysToAdd;
+            const next = getAvatarStats();
+            const leveledUp = (next.level !== prev.level) || (next.season > prev.season);
+            renderAvatarHUD();
+            triggerAvatarCelebration(leveledUp, next.season > prev.season);
+        }
+
+        function resetAvatarPreviewOffset() {
+            avatarPreviewExtraWorkouts = 0;
+            renderAvatarHUD();
+            showToast('Avatar restaurado a tu nivel real');
+        }
+
+        // ----------------------------------------------------
         // 10. MODALES Y NAVEGACIÓN
         // ----------------------------------------------------
         function switchTab(tabName) {
             appState.currentTab = tabName;
-            const tabs = ['entrenar', 'combustible', 'historial', 'calendario'];
+            const tabs = ['entrenar', 'combustible', 'avatar', 'historial', 'calendario'];
             tabs.forEach(t => {
                 document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
                 const navBtn = document.getElementById(`nav-${t}`);
@@ -3490,6 +4291,22 @@
                 }
             });
             renderAll();
+            if (tabName === 'avatar') {
+                setTimeout(() => {
+                    if (avatarStyleMode === 'mesh3d') {
+                        initAvatar3DScene();
+                        resizeAvatar3D();
+                    } else {
+                        initAvatarImageFX();
+                    }
+                    renderAvatarHUD();
+                    if (pendingAvatarCelebration) {
+                        const info = pendingAvatarCelebration;
+                        pendingAvatarCelebration = null;
+                        triggerAvatarCelebration(info.isLevelUp);
+                    }
+                }, 60);
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3642,6 +4459,7 @@
             renderDaySelector();
             renderExercisesList();
             renderNutritionTab();
+            renderAvatarHUD();
             renderHistoryTab();
             renderCalendarTab();
         }
